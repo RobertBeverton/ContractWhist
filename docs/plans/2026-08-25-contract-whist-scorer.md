@@ -2326,6 +2326,8 @@ Depends on Tasks 15–18.
 
 **Step 1: Implement**
 
+> **Note:** this block is the actual, current implementation, updated after two rounds of review found real bugs in the original draft (see the callouts inline): a `hand === null` heading that would literally render "dealing null cards each", ending an incomplete session with no confirmation, and a save failure that only reached a visually-hidden live region where a sighted user would never see it.
+
 ```js
 import { createTotalsBar } from '../components/totalsBar.js';
 import { createRoundEntry } from '../components/roundEntry.js';
@@ -2333,7 +2335,7 @@ import { createRoundHistory } from '../components/roundHistory.js';
 import { currentHand, isComplete } from '../logic/sessionFlow.js';
 
 export function renderScorer({ state, actions }) {
-  const { session, playersById, entries, errors, editingIndex, statusMessage } = state;
+  const { session, playersById, entries, errors, editingIndex, statusMessage, saveError, saving } = state;
   const screen = document.createElement('section');
   screen.className = 'screen scorer';
 
@@ -2341,10 +2343,17 @@ export function renderScorer({ state, actions }) {
   const hand = editing ? session.rounds[editingIndex].hand : currentHand(session);
   const roundNumber = editing ? editingIndex + 1 : session.rounds.length + 1;
 
+  // A completed-but-not-yet-ended session (all rounds played, "See final
+  // scores" not yet clicked) is live on screen, if only briefly — hand is
+  // null and there's no round to head. Give that state its own heading
+  // rather than falling through to `currentHand(session)` unchecked, which
+  // would render the nonsensical "Round N — dealing null cards each".
   const heading = document.createElement('h1');
   heading.textContent = editing
     ? `Editing round ${roundNumber} — hand of ${hand}`
-    : `Round ${roundNumber} — dealing ${hand} cards each`;
+    : hand !== null
+      ? `Round ${roundNumber} — dealing ${hand} cards each`
+      : 'All rounds played';
   screen.append(heading);
 
   // 4.1.3 Status Messages — announce totals updates without stealing focus.
@@ -2354,6 +2363,17 @@ export function renderScorer({ state, actions }) {
   status.setAttribute('aria-live', 'polite');
   status.textContent = statusMessage ?? '';
   screen.append(status);
+
+  // A save failure must actually be seen, not just announced to assistive
+  // tech — the polite live region above is easy to miss, and silently
+  // playing on after autosave breaks risks losing the whole session.
+  if (saveError) {
+    const saveAlert = document.createElement('div');
+    saveAlert.setAttribute('role', 'alert');
+    saveAlert.className = 'error scorer__alert';
+    saveAlert.textContent = saveError;
+    screen.append(saveAlert);
+  }
 
   screen.append(createTotalsBar({ session, playersById }));
 
@@ -2384,6 +2404,10 @@ export function renderScorer({ state, actions }) {
     lockIn.type = 'button';
     lockIn.className = 'primary scorer__lockin';
     lockIn.textContent = editing ? 'Save changes' : 'Lock in round';
+    // Disabled while a previous lock-in/edit is still saving — belt-and-braces
+    // alongside actions.js's own re-entrancy guard, and gives the user a
+    // visible reason a rapid double-tap didn't do anything twice.
+    lockIn.disabled = Boolean(saving);
     lockIn.addEventListener('click', editing ? actions.saveEdit : actions.lockInRound);
     screen.append(lockIn);
 
@@ -2395,8 +2419,11 @@ export function renderScorer({ state, actions }) {
       screen.append(cancel);
     }
   } else {
+    // The heading above already says "All rounds played" — this just adds
+    // the pointer to what happens next, rather than repeating the heading.
     const done = document.createElement('p');
-    done.textContent = 'All rounds played.';
+    done.className = 'muted';
+    done.textContent = 'Every round has been scored. See the final scores to finish up.';
     screen.append(done);
   }
 
@@ -2459,23 +2486,34 @@ Connects the scorer to storage. Autosave fires after every lock-in, per the spec
 
 **Step 1: Implement the actions**
 
+> **Note:** this block is the actual, current implementation — updated after review found real bugs in the original draft (see the callouts inline). The original draft was also missing `togglePlayer`/`setDealerRestriction`/`setStartSize`/`startSession`, which `renderSetup` (Tasks 13-14) already calls; those are included below too.
+
 ```js
 import { lockInRound, editRound } from '../logic/sessionFlow.js';
-import { saveSession } from '../storage/sessions.js';
+import { saveSession, createSession } from '../storage/sessions.js';
 import { createPlayer, savePlayer } from '../storage/players.js';
 
 export function createActions(store) {
   const get = () => store.getState();
 
-  /** Autosave after every change that alters the record. */
+  /**
+   * Autosave after every change that alters the record.
+   *
+   * On failure this sets `saveError` (not `statusMessage`) — a dedicated,
+   * always-visible field distinct from the polite live-region status text,
+   * because a save failure is exactly the kind of thing a sighted user must
+   * actually see, not just have announced to assistive tech. Cleared by the
+   * next successful persist.
+   */
   async function persist(session) {
     try {
       await saveSession(session);
+      store.setState({ saveError: null });
       return true;
     } catch (error) {
       console.error('Autosave failed', error);
       store.setState({
-        statusMessage: 'Could not save — your scores are still on screen. Try again.',
+        saveError: 'Could not save — your scores are still on screen, but not backed up. Keep playing; the next round will try saving again.',
       });
       return false;
     }
@@ -2490,12 +2528,20 @@ export function createActions(store) {
     },
 
     async lockInRound() {
+      if (get().saving) return; // ignore a double-tap/double-fire while a save is in flight
       const { session, entries } = get();
       const { session: next, errors } = lockInRound(session, entries);
       if (errors.length > 0) return store.setState({ errors });
 
-      store.setState({ session: next, entries: {}, errors: [], statusMessage: 'Round saved.' });
+      store.setState({
+        session: next,
+        entries: {},
+        errors: [],
+        statusMessage: 'Round saved.',
+        saving: true,
+      });
       await persist(next);
+      store.setState({ saving: false });
     },
 
     editLatestRound() {
@@ -2511,6 +2557,7 @@ export function createActions(store) {
     },
 
     async saveEdit() {
+      if (get().saving) return;
       const { session, entries, editingIndex } = get();
       const { session: next, errors } = editRound(session, editingIndex, entries);
       if (errors.length > 0) return store.setState({ errors });
@@ -2521,8 +2568,10 @@ export function createActions(store) {
         errors: [],
         editingIndex: null,
         statusMessage: 'Round updated.',
+        saving: true,
       });
       await persist(next);
+      store.setState({ saving: false });
     },
 
     cancelEdit() {
@@ -2530,19 +2579,60 @@ export function createActions(store) {
     },
 
     async endSession() {
+      // No confirmation here — src/screens/scorer.js already gates the call
+      // behind window.confirm() before invoking this action (except when the
+      // session is already complete, where nothing is lost by ending).
+      if (get().saving) return;
       const { session } = get();
       const finished = { ...session, status: 'complete' };
-      store.setState({ session: finished, screen: 'summary' });
+      store.setState({ session: finished, screen: 'summary', saving: true });
       await persist(finished);
+      store.setState({ saving: false });
     },
 
     async addPlayer(name) {
       const player = createPlayer(name);
       await savePlayer(player);
-      const { allPlayers } = get();
+      const { allPlayers, playersById } = get();
       store.setState({
         allPlayers: [...allPlayers, player].sort((a, b) => a.name.localeCompare(b.name)),
+        // Kept in sync with allPlayers — the scorer screen looks names up
+        // here, and a player added right before starting a session would
+        // otherwise render as a raw id instead of their name.
+        playersById: { ...playersById, [player.id]: player },
       });
+    },
+
+    togglePlayer(id) {
+      const { selectedPlayerIds } = get();
+      const next = selectedPlayerIds.includes(id)
+        ? selectedPlayerIds.filter((playerId) => playerId !== id)
+        : [...selectedPlayerIds, id];
+      store.setState({ selectedPlayerIds: next });
+    },
+
+    setDealerRestriction(value) {
+      store.setState({ dealerRestriction: value });
+    },
+
+    setStartSize(value) {
+      store.setState({ startSize: value });
+    },
+
+    async startSession() {
+      const { selectedPlayerIds, startSize, dealerRestriction } = get();
+      const session = createSession({
+        players: selectedPlayerIds,
+        startSize,
+        dealerRestriction,
+      });
+      store.setState({ session, screen: 'scorer', entries: {}, errors: [], editingIndex: null });
+      // Persist immediately: a session becomes resumable ("in-progress" in
+      // storage) the moment it exists, not after the first round is locked
+      // in. Without this, closing the tab before round 1 would leave nothing
+      // for loadInProgressSession() to find, defeating the resume feature
+      // for exactly the window right after setup.
+      await persist(session);
     },
   };
 }
@@ -2566,10 +2656,13 @@ if (inProgress) {
 }
 ```
 
+**Note:** the store's initial state needs two more fields alongside `entries`/`errors`/`editingIndex`/`statusMessage` — `saveError: null` and `saving: false` — for the visible-failure and double-submission fixes in the actions block above.
+
 **Step 3: Verify by hand**
 
 - Score two rounds, hard-refresh the browser, confirm the resume prompt restores them.
 - Edit the last round, confirm totals recompute and the change survives a refresh.
+- Fire two quick clicks on "Lock in round" — confirm only one round is appended and the button is briefly disabled.
 
 **Step 4: Commit**
 
