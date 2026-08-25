@@ -14,7 +14,7 @@ import { currentHand, isComplete } from '../logic/sessionFlow.js';
  * cancelEdit, editLatestRound, endSession) are wired to real logic in Task 20.
  */
 export function renderScorer({ state, actions }) {
-  const { session, playersById, entries, errors, editingIndex, statusMessage } = state;
+  const { session, playersById, entries, errors, editingIndex, statusMessage, saveError, saving } = state;
   const screen = document.createElement('section');
   screen.className = 'screen scorer';
 
@@ -42,6 +42,17 @@ export function renderScorer({ state, actions }) {
   status.setAttribute('aria-live', 'polite');
   status.textContent = statusMessage ?? '';
   screen.append(status);
+
+  // A save failure must actually be seen, not just announced to assistive
+  // tech — the polite live region above is easy to miss, and silently
+  // playing on after autosave breaks risks losing the whole session.
+  if (saveError) {
+    const saveAlert = document.createElement('div');
+    saveAlert.setAttribute('role', 'alert');
+    saveAlert.className = 'error scorer__alert';
+    saveAlert.textContent = saveError;
+    screen.append(saveAlert);
+  }
 
   screen.append(createTotalsBar({ session, playersById }));
 
@@ -72,6 +83,10 @@ export function renderScorer({ state, actions }) {
     lockIn.type = 'button';
     lockIn.className = 'primary scorer__lockin';
     lockIn.textContent = editing ? 'Save changes' : 'Lock in round';
+    // Disabled while a previous lock-in/edit is still saving — belt-and-braces
+    // alongside actions.js's own re-entrancy guard, and gives the user a
+    // visible reason a rapid double-tap didn't do anything twice.
+    lockIn.disabled = Boolean(saving);
     lockIn.addEventListener('click', editing ? actions.saveEdit : actions.lockInRound);
     screen.append(lockIn);
 

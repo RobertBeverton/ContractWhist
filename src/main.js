@@ -24,6 +24,8 @@ async function main() {
     errors: [],
     editingIndex: null,
     statusMessage: null,
+    saveError: null,
+    saving: false,
   });
 
   const actions = createActions(store);

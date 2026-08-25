@@ -5,15 +5,24 @@ import { createPlayer, savePlayer } from '../storage/players.js';
 export function createActions(store) {
   const get = () => store.getState();
 
-  /** Autosave after every change that alters the record. */
+  /**
+   * Autosave after every change that alters the record.
+   *
+   * On failure this sets `saveError` (not `statusMessage`) — a dedicated,
+   * always-visible field distinct from the polite live-region status text,
+   * because a save failure is exactly the kind of thing a sighted user must
+   * actually see, not just have announced to assistive tech. Cleared by the
+   * next successful persist.
+   */
   async function persist(session) {
     try {
       await saveSession(session);
+      store.setState({ saveError: null });
       return true;
     } catch (error) {
       console.error('Autosave failed', error);
       store.setState({
-        statusMessage: 'Could not save — your scores are still on screen. Try again.',
+        saveError: 'Could not save — your scores are still on screen, but not backed up. Keep playing; the next round will try saving again.',
       });
       return false;
     }
@@ -28,12 +37,20 @@ export function createActions(store) {
     },
 
     async lockInRound() {
+      if (get().saving) return; // ignore a double-tap/double-fire while a save is in flight
       const { session, entries } = get();
       const { session: next, errors } = lockInRound(session, entries);
       if (errors.length > 0) return store.setState({ errors });
 
-      store.setState({ session: next, entries: {}, errors: [], statusMessage: 'Round saved.' });
+      store.setState({
+        session: next,
+        entries: {},
+        errors: [],
+        statusMessage: 'Round saved.',
+        saving: true,
+      });
       await persist(next);
+      store.setState({ saving: false });
     },
 
     editLatestRound() {
@@ -49,6 +66,7 @@ export function createActions(store) {
     },
 
     async saveEdit() {
+      if (get().saving) return;
       const { session, entries, editingIndex } = get();
       const { session: next, errors } = editRound(session, editingIndex, entries);
       if (errors.length > 0) return store.setState({ errors });
@@ -59,8 +77,10 @@ export function createActions(store) {
         errors: [],
         editingIndex: null,
         statusMessage: 'Round updated.',
+        saving: true,
       });
       await persist(next);
+      store.setState({ saving: false });
     },
 
     cancelEdit() {
@@ -71,10 +91,12 @@ export function createActions(store) {
       // No confirmation here — src/screens/scorer.js already gates the call
       // behind window.confirm() before invoking this action (except when the
       // session is already complete, where nothing is lost by ending).
+      if (get().saving) return;
       const { session } = get();
       const finished = { ...session, status: 'complete' };
-      store.setState({ session: finished, screen: 'summary' });
+      store.setState({ session: finished, screen: 'summary', saving: true });
       await persist(finished);
+      store.setState({ saving: false });
     },
 
     async addPlayer(name) {
