@@ -23,6 +23,12 @@ export function createRoundHistory({ session, playersById, onEditLatest }) {
 
   const list = document.createElement('ol');
   list.className = 'history';
+  // Every <li> below sets its own `.value`, which determines its displayed
+  // ordinal outright — per the HTML list-numbering algorithm, `reversed`
+  // only affects auto-increment direction for items *without* an explicit
+  // value, so it has no effect on the numbers actually shown here. Kept
+  // anyway as an accurate semantic marker (this list's natural order really
+  // is descending) for any tooling that reads the IDL property directly.
   list.reversed = true;
 
   session.rounds.forEach((round, index) => {
