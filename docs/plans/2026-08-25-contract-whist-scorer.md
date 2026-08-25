@@ -1322,6 +1322,13 @@ Screen swaps must move focus to the new `<h1>`, or a keyboard/screen-reader user
 /**
  * Render the active screen into the root element.
  * `screens` maps a screen name to a render function returning an element.
+ *
+ * Screens (setup, scorer, ...) are called as `renderScreen(state)` only —
+ * they also need `actions` (see e.g. src/screens/setup.js's `{state, actions}`
+ * param). Wiring `actions` through is deliberately deferred to Task 20
+ * ("Wire actions, autosave, and resume"), which is where the caller of
+ * `render(state)` will need to pass `{ state, actions }` instead of a bare
+ * state object. Not a bug in this file — just not built yet.
  */
 export function createRouter(root, screens) {
   return function render(state) {
@@ -1711,11 +1718,20 @@ Append inside `renderSetup`, before `return`:
   startButton.addEventListener('click', () => actions.startSession());
 
   // Explain WHY it's disabled — a disabled control with no reason is a dead end.
+  // NOTE: a natively `disabled` button is unfocusable, so a screen reader
+  // may never reach this description via aria-describedby regardless — a
+  // disabled control's reason is only reliably announced with the
+  // aria-disabled (not disabled) + focusable pattern. Kept as plain
+  // `disabled` here (matches every other disabled control in this codebase);
+  // flagged for Review Gate 3's keyboard/screen-reader pass to confirm
+  // whether this is sufficient.
   if (playerCount < 2) {
     const why = document.createElement('p');
+    why.id = 'start-reason';
     why.className = 'muted';
     why.textContent = 'Select at least 2 players to start.';
     screen.append(why);
+    startButton.setAttribute('aria-describedby', 'start-reason');
   }
   screen.append(startButton);
 ```
