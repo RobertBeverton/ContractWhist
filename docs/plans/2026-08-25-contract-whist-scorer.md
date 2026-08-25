@@ -1125,7 +1125,7 @@ Every pairing below is contrast-checked against WCAG AA. Do not add a colour to 
 
   /* Status — never used as the ONLY signal (1.4.1) */
   --danger: #b3261e;          /* 6.4:1 on --bg */
-  --success: #12633b;         /* 6.1:1 on --bg */
+  --success: #12633b;         /* 7.3:1 on --bg */
 
   --focus-ring: #b45309;      /* 4.6:1 on --bg and 3:1+ against --accent */
 
