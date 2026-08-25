@@ -2404,11 +2404,20 @@ export function renderScorer({ state, actions }) {
     createRoundHistory({ session, playersById, onEditLatest: actions.editLatestRound }),
   );
 
+  const sessionComplete = isComplete(session);
   const endButton = document.createElement('button');
   endButton.type = 'button';
   endButton.className = 'scorer__end';
-  endButton.textContent = isComplete(session) ? 'See final scores' : 'End session early';
-  endButton.addEventListener('click', actions.endSession);
+  endButton.textContent = sessionComplete ? 'See final scores' : 'End session early';
+  endButton.addEventListener('click', () => {
+    // Ending early commits the session as complete — it can no longer be
+    // resumed as in-progress. A fat-fingered tap here would silently cut a
+    // real game short with no undo, so confirm before committing. No prompt
+    // needed once every round is already played — nothing is lost then.
+    if (sessionComplete || window.confirm('End this session now? The game will be marked finished.')) {
+      actions.endSession();
+    }
+  });
   screen.append(endButton);
 
   return screen;
