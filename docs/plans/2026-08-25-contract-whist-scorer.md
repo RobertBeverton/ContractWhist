@@ -1290,7 +1290,12 @@ Expected: FAIL — cannot find module.
 **Step 3: Write `src/app/store.js`**
 
 ```js
-/** Minimal observable state container. setState merges a partial update. */
+/**
+ * Minimal observable state container. setState shallow-merges a partial
+ * update — nested values (e.g. `session`) are replaced wholesale, not
+ * deep-merged. Callers updating part of a nested object must spread it
+ * themselves: setState({ session: { ...session, rounds: [...] } }).
+ */
 export function createStore(initialState) {
   let state = { ...initialState };
   const listeners = new Set();
@@ -1331,6 +1336,10 @@ export function createRouter(root, screens) {
     if (heading) {
       heading.setAttribute('tabindex', '-1');
       heading.focus();
+    } else {
+      // A screen with no <h1> silently strands focus — a WCAG 2.4.3
+      // violation. Warn loudly so it surfaces during hand-testing.
+      console.warn(`Screen "${state.screen}" has no <h1> — focus was not moved.`);
     }
   };
 }
