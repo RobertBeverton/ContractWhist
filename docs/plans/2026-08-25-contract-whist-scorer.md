@@ -1520,9 +1520,19 @@ Depends on Tasks 10–12.
 
 A checkbox list of saved players plus an add-player field. Checkboxes (not a custom widget) mean keyboard and screen-reader support comes free, and each row's 44px target satisfies 2.5.8.
 
+**Do not put `.target` on the row.** `base.css`'s sizing utility is `button, .target { min-width; min-height; border; background; cursor: pointer; ... }` — it bundles 44px sizing with visible button chrome. A checkbox-list row is not a button; give `.setup__player` its own `min-height: var(--target-min)` directly in `setup.css` instead (same pattern `.stepper__button` already uses), and leave `:focus-visible` alone since it's a global rule, not scoped to `.target`.
+
 ```js
 import { maxHandSize } from '../logic/handSequence.js';
 
+/**
+ * KNOWN GAP (deliberately deferred, not forgotten): no duplicate-name check
+ * on add — two players named "Rob" would render as identical,
+ * indistinguishable checkboxes. state.allPlayers is available here if this
+ * screen ends up owning the check; revisit when Task 20 wires the real
+ * addPlayer action, which is the point a decision on which layer owns this
+ * becomes concrete.
+ */
 export function renderSetup({ state, actions }) {
   const screen = document.createElement('section');
   screen.className = 'screen setup';
@@ -1546,7 +1556,7 @@ export function renderSetup({ state, actions }) {
 
   for (const player of state.allPlayers) {
     const row = document.createElement('div');
-    row.className = 'setup__player target';
+    row.className = 'setup__player'; // no .target — see note above
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
