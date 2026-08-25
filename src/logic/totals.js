@@ -4,6 +4,11 @@ import { roundPoints } from './scoring.js';
  * Running totals per player, always derived from the full rounds array.
  * Never stored incrementally — recomputing from source is what makes editing
  * an earlier round safe.
+ *
+ * Assumes every round in `rounds` already passed validateRound (via
+ * sessionFlow.js's lockInRound/editRound) — a round with a missing `won`
+ * value silently scores as 0 rather than erroring, since this function does
+ * not re-validate its input.
  */
 export function computeTotals(players, rounds) {
   const totals = Object.fromEntries(players.map((id) => [id, 0]));
