@@ -70,7 +70,3 @@
 .setup__start {
   margin-top: var(--space);
 }
-
-.muted {
-  color: var(--text-muted);
-}
