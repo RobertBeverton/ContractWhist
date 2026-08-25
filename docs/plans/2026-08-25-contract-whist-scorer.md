@@ -1326,24 +1326,37 @@ export function createStore(initialState) {
 
 Screen swaps must move focus to the new `<h1>`, or a keyboard/screen-reader user is stranded where the old screen was (*2.4.3 Focus Order*).
 
+> **Note:** this block is the actual, current implementation. Two things changed since the version originally drafted here: (1) Task 20 passes `{state, actions}` to screens, not a bare state object — that gap was flagged in this file's own comment and closed in Task 20. (2) Review Gate 4 found, by executing the real store+router+actions wiring, that moving focus on *every* render (not just screen changes) stole keyboard focus away from whatever input the user was typing into on every keystroke or +/- stepper click — since the store has no fine-grained subscriptions, `actions.updateEntry()` triggers the identical `render()` call as an actual screen transition. Fixed by tracking the last-rendered screen name and only moving focus when it changed.
+
 ```js
 /**
  * Render the active screen into the root element.
  * `screens` maps a screen name to a render function returning an element.
  *
- * Screens (setup, scorer, ...) are called as `renderScreen(state)` only —
- * they also need `actions` (see e.g. src/screens/setup.js's `{state, actions}`
- * param). Wiring `actions` through is deliberately deferred to Task 20
- * ("Wire actions, autosave, and resume"), which is where the caller of
- * `render(state)` will need to pass `{ state, actions }` instead of a bare
- * state object. Not a bug in this file — just not built yet.
+ * Screens (setup, scorer, ...) expect `{ state, actions }` (see e.g.
+ * src/screens/setup.js's `{state, actions}` param), so `render` takes both
+ * and passes them through together.
+ *
+ * This re-renders on every state change (the store has no fine-grained
+ * subscriptions), not just on screen transitions — a keystroke in a stepper
+ * fires the same render() call as navigating to a whole new screen. Focus
+ * must only move to the heading on an actual screen change; moving it on
+ * every state update stole focus from whatever input the user was mid-typing
+ * into on every keystroke (found by execution during Review Gate 4).
  */
 export function createRouter(root, screens) {
-  return function render(state) {
+  let lastScreen = null;
+
+  return function render(state, actions) {
     const renderScreen = screens[state.screen];
     if (!renderScreen) throw new Error(`Unknown screen: ${state.screen}`);
 
-    root.replaceChildren(renderScreen(state));
+    const screenChanged = state.screen !== lastScreen;
+    lastScreen = state.screen;
+
+    root.replaceChildren(renderScreen({ state, actions }));
+
+    if (!screenChanged) return;
 
     // Move focus to the new screen's heading so keyboard and screen reader
     // users land in the right place after a screen change.
@@ -2677,7 +2690,7 @@ git commit -m "feat: wire scorer actions with autosave and resume"
 
 **Run the suite:** `npm run test` → PASS, 58 tests.
 
-**Play a full session by hand** — 4 players, start size 3 (9 rounds, quick), entering real numbers.
+**Play a full session by hand** — 4 players, start size 5 (9 rounds: 5,4,3,2,1,2,3,4,5 — quick), entering real numbers. (Start size 3 gives 5 rounds, not 9 — corrected here after Gate 4 caught the original wording's arithmetic error.)
 
 **Accessibility check (second of three):**
 1. **Lighthouse → Accessibility** on the scorer mid-round: 100, no violations.
