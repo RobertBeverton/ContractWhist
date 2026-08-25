@@ -4,6 +4,11 @@
  * Uses a native input (so a keyboard user can type a value directly) plus
  * large buttons (so a tablet user never has to hit a spinner arrow).
  *
+ * `value` is captured in the button click handlers at creation time — this
+ * component does not track its own state. Callers must re-create it (via a
+ * fresh render, not a mutation) after every onChange to reflect the new
+ * value; this matches the app's state-store + full-re-render pattern.
+ *
  * @param {object} options
  * @param {string} options.id          - input id, for the <label>
  * @param {string} options.label       - visible label text
@@ -47,6 +52,7 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
     // The visible "−" is not a meaningful name for a screen reader (4.1.2).
     button.setAttribute('aria-label', `${accessibleLabel} ${label}`);
     button.addEventListener('click', () => {
+      // From an empty field, either direction steps to `min` (not min ± 1).
       const next = clamp((value ?? (delta > 0 ? min - 1 : min + 1)) + delta);
       input.value = String(next);
       onChange(next);
