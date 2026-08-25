@@ -1,0 +1,9 @@
+.scorer__alert {
+  padding: var(--space);
+  border: 3px solid var(--danger);
+  border-radius: var(--radius);
+  margin-bottom: var(--space);
+}
+
+.scorer__lockin { width: 100%; font-size: var(--font-large); margin-bottom: var(--space); }
+.scorer__end { margin-top: calc(var(--space) * 3); }
