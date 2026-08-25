@@ -1,0 +1,16 @@
+.totals__table { width: 100%; border-collapse: collapse; }
+
+.totals__table th,
+.totals__table td {
+  text-align: left;
+  padding: var(--space);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--font-large);
+}
+
+.totals__score {
+  font-size: var(--font-total);
+  font-variant-numeric: tabular-nums;   /* digits don't jitter as scores change */
+  font-weight: 700;
+  text-align: right;
+}
