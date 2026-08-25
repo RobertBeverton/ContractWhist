@@ -6,7 +6,7 @@
 
   /* Text */
   --text: #14181f;            /* 16.9:1 on --bg */
-  --text-muted: #4b5563;      /* 8.0:1 on --bg — muted, still AA for body text */
+  --text-muted: #4b5563;      /* 7.6:1 on --bg — muted, still AA for body text */
 
   /* Accent (actions) */
   --accent: #1d4ed8;          /* 6.7:1 on --bg */
