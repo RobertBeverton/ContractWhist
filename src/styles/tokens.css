@@ -14,7 +14,7 @@
 
   /* Status — never used as the ONLY signal (1.4.1) */
   --danger: #b3261e;          /* 6.4:1 on --bg */
-  --success: #12633b;         /* 6.1:1 on --bg */
+  --success: #12633b;         /* 7.3:1 on --bg */
 
   --focus-ring: #b45309;      /* ~5:1 on --bg. NOT ≥3:1 against --accent (~1.3:1) —
                                   base.css uses outline-offset so the ring's edge sits
