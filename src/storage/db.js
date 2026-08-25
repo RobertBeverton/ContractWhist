@@ -20,10 +20,17 @@ export function openDb() {
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(new Error('Database upgrade blocked by another open connection'));
   });
 }
 
-/** Promise wrapper around a single IndexedDB request. */
+/**
+ * Promise wrapper around a single IndexedDB request.
+ * Resolves on the request's own success, not the enclosing transaction's
+ * completion — correct for the single-request-per-transaction calls this
+ * project makes (put/getAll), not safe to reuse inside a multi-request
+ * transaction without also gating on tx.oncomplete.
+ */
 export function promisifyRequest(request) {
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve(request.result);
