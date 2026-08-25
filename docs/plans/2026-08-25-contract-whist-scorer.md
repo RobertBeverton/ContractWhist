@@ -814,7 +814,7 @@ export async function loadAllPlayers() {
 **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/storage/players.test.js`
-Expected: PASS, 8 tests.
+Expected: PASS, 7 tests.
 
 **Step 5: Commit**
 
@@ -1052,7 +1052,7 @@ Expected: PASS, 2 tests.
 **Step 5: Run the whole suite for regressions**
 
 Run: `npm run test`
-Expected: PASS, 43 tests.
+Expected: PASS, 42 tests.
 
 **Step 6: Commit**
 
@@ -1068,7 +1068,7 @@ git commit -m "feat: degrade gracefully when storage is unavailable"
 **Run the full suite:**
 
 Run: `npm run test`
-Expected: PASS, 43 tests across 7 files.
+Expected: PASS, 42 tests across 7 files.
 
 **Review Phases 1–2 against the spec:**
 
@@ -1702,7 +1702,7 @@ git commit -m "feat: complete setup screen with rules and hand size"
 
 ## 🚦 Review Gate 3 — after Task 14 (end of Phase 3)
 
-**Run the suite:** `npm run test` → PASS, 47 tests.
+**Run the suite:** `npm run test` → PASS, 46 tests.
 
 **Accessibility check (first of three). In Chrome DevTools:**
 1. Run **Lighthouse → Accessibility** on the setup screen. Expected: 100, no violations.
@@ -2482,7 +2482,7 @@ git commit -m "feat: wire scorer actions with autosave and resume"
 
 ## 🚦 Review Gate 4 — after Task 20 (end of Phase 4)
 
-**Run the suite:** `npm run test` → PASS, 57 tests.
+**Run the suite:** `npm run test` → PASS, 56 tests.
 
 **Play a full session by hand** — 4 players, start size 3 (9 rounds, quick), entering real numbers.
 
@@ -3097,7 +3097,7 @@ git commit -m "docs: record tablet device test results"
 
 ## 🚦 Review Gate 5 — after Task 25 (final gate)
 
-**Run the suite:** `npm run test` → PASS, 67 tests.
+**Run the suite:** `npm run test` → PASS, 66 tests.
 
 **Accessibility check (third of three — the full pass):**
 1. **Lighthouse → Accessibility** on all four screens: 100, zero violations.
