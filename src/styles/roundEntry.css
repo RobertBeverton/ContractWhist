@@ -1,0 +1,19 @@
+.round-entry__row {
+  display: flex;
+  flex-wrap: wrap;         /* stacks on narrow widths — 1.4.10 Reflow */
+  align-items: flex-end;
+  gap: var(--space);
+  padding: var(--space);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space);
+  background: var(--surface);
+}
+
+.round-entry__name {
+  flex: 1 1 8rem;
+  margin: 0;
+  font-size: var(--font-large);
+}
+
+.round-entry__dealer { font-size: var(--font-base); color: var(--text-muted); }
