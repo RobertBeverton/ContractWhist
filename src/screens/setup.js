@@ -1,11 +1,11 @@
 import { maxHandSize } from '../logic/handSequence.js';
+import { createStepper } from '../components/stepper.js';
 
 /**
- * Setup screen: player selection.
+ * Setup screen: player selection, house rules, hand size, and start.
  *
- * This is step 1 of the setup screen (Task 13) — rules toggle, hand size,
- * and the start button are added in Task 14. Kept in one file per the plan
- * (the split across tasks is only to keep each task under ~10 minutes).
+ * Kept in one file per the plan (the split across Tasks 13/14 was only to
+ * keep each task under ~10 minutes).
  *
  * `state.allPlayers` — [{id, name}], from the player-profile store.
  * `state.selectedPlayerIds` — array of currently-checked player ids.
@@ -86,5 +86,92 @@ export function renderSetup({ state, actions }) {
   playersGroup.append(addRow);
   screen.append(playersGroup);
 
-  return { screen, playersGroup };
+  const playerCount = state.selectedPlayerIds.length;
+  const maxHand = playerCount >= 2 ? maxHandSize(playerCount) : null;
+
+  // --- Dealer restriction ---------------------------------------------
+  const rulesGroup = document.createElement('fieldset');
+  const rulesLegend = document.createElement('legend');
+  rulesLegend.textContent = 'House rules';
+
+  const ruleRow = document.createElement('div');
+  ruleRow.className = 'setup__rule'; // no .target — see setup.css, same fix as .setup__player
+
+  const ruleCheckbox = document.createElement('input');
+  ruleCheckbox.type = 'checkbox';
+  ruleCheckbox.id = 'dealer-restriction';
+  ruleCheckbox.checked = state.dealerRestriction;
+  ruleCheckbox.setAttribute('aria-describedby', 'dealer-restriction-hint');
+  ruleCheckbox.addEventListener('change', () =>
+    actions.setDealerRestriction(ruleCheckbox.checked),
+  );
+
+  const ruleLabel = document.createElement('label');
+  ruleLabel.htmlFor = ruleCheckbox.id;
+  ruleLabel.textContent = 'Someone must go down';
+
+  // 3.3.2 Labels or Instructions — explain the rule, don't assume it's known.
+  const ruleHint = document.createElement('p');
+  ruleHint.id = 'dealer-restriction-hint';
+  ruleHint.className = 'muted';
+  ruleHint.textContent =
+    "The dealer can't bid a number that makes the bids add up to the hand size.";
+
+  ruleRow.append(ruleCheckbox, ruleLabel);
+  rulesGroup.append(rulesLegend, ruleRow, ruleHint);
+  screen.append(rulesGroup);
+
+  // --- Starting hand size ----------------------------------------------
+  const handGroup = document.createElement('fieldset');
+  const handLegend = document.createElement('legend');
+  handLegend.textContent = 'Starting hand size';
+  handGroup.append(handLegend);
+
+  if (maxHand === null) {
+    const hint = document.createElement('p');
+    hint.className = 'muted';
+    hint.textContent = 'Select at least 2 players to choose a hand size.';
+    handGroup.append(hint);
+  } else {
+    // Live feedback on the deal, per the spec: show how many cards to deal.
+    const hint = document.createElement('p');
+    hint.id = 'hand-size-hint';
+    hint.className = 'muted';
+    hint.textContent =
+      `${playerCount} players — up to ${maxHand} cards each ` +
+      `(one card is kept back to turn up trumps).`;
+
+    handGroup.append(
+      hint,
+      createStepper({
+        id: 'start-hand-size',
+        label: 'Cards in the first hand',
+        value: Math.min(state.startSize, maxHand),
+        min: 1,
+        max: maxHand,
+        describedBy: 'hand-size-hint',
+        onChange: (value) => actions.setStartSize(value),
+      }),
+    );
+  }
+  screen.append(handGroup);
+
+  // --- Start ------------------------------------------------------------
+  const startButton = document.createElement('button');
+  startButton.type = 'button';
+  startButton.className = 'primary setup__start';
+  startButton.textContent = 'Start session';
+  startButton.disabled = playerCount < 2;
+  startButton.addEventListener('click', () => actions.startSession());
+
+  // Explain WHY it's disabled — a disabled control with no reason is a dead end.
+  if (playerCount < 2) {
+    const why = document.createElement('p');
+    why.className = 'muted';
+    why.textContent = 'Select at least 2 players to start.';
+    screen.append(why);
+  }
+  screen.append(startButton);
+
+  return screen;
 }

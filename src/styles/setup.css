@@ -46,6 +46,31 @@
   padding: 0 calc(var(--space) * 1.5);
 }
 
+/* Same fix as .setup__player above: a checkbox + label row is not a
+   button, so it deliberately does NOT use the shared `.target` utility
+   from base.css (which bundles 44px sizing with button chrome). This
+   sets the 2.5.8 minimum target size directly instead. */
+.setup__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  min-height: var(--target-min);
+}
+
+.setup__rule input[type='checkbox'] {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.setup__rule label {
+  font-size: var(--font-base);
+}
+
+.setup__start {
+  margin-top: var(--space);
+}
+
 .muted {
   color: var(--text-muted);
 }
