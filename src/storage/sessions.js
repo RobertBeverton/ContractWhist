@@ -36,13 +36,18 @@ export async function saveSession(session) {
   db.close();
 }
 
-/** All sessions, newest first. */
+/** All sessions, newest first. Degrades to [] if storage is unavailable. */
 export async function loadAllSessions() {
-  const db = await openDb();
-  const tx = db.transaction(STORES.sessions, 'readonly');
-  const sessions = await promisifyRequest(tx.objectStore(STORES.sessions).getAll());
-  db.close();
-  return sessions.sort((a, b) => b.sessionId.localeCompare(a.sessionId));
+  try {
+    const db = await openDb();
+    const tx = db.transaction(STORES.sessions, 'readonly');
+    const sessions = await promisifyRequest(tx.objectStore(STORES.sessions).getAll());
+    db.close();
+    return sessions.sort((a, b) => b.sessionId.localeCompare(a.sessionId));
+  } catch (error) {
+    console.warn('Could not load sessions; continuing with none.', error);
+    return [];
+  }
 }
 
 /** The most recent unfinished session, if one was interrupted. */

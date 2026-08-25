@@ -21,11 +21,16 @@ export async function savePlayer(player) {
   db.close();
 }
 
-/** All player profiles, sorted by name for stable display in the picker. */
+/** All player profiles, sorted by name for stable display in the picker. Degrades to [] if storage is unavailable. */
 export async function loadAllPlayers() {
-  const db = await openDb();
-  const tx = db.transaction(STORES.players, 'readonly');
-  const players = await promisifyRequest(tx.objectStore(STORES.players).getAll());
-  db.close();
-  return players.sort((a, b) => a.name.localeCompare(b.name));
+  try {
+    const db = await openDb();
+    const tx = db.transaction(STORES.players, 'readonly');
+    const players = await promisifyRequest(tx.objectStore(STORES.players).getAll());
+    db.close();
+    return players.sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.warn('Could not load players; continuing with none.', error);
+    return [];
+  }
 }
