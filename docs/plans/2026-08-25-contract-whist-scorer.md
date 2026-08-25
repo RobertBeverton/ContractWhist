@@ -1466,6 +1466,16 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text);
+  /* Hide the native spin buttons — they're far below the 44px target size
+     this component exists to provide; the −/+ buttons replace them. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stepper__input::-webkit-outer-spin-button,
+.stepper__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .stepper__input[aria-invalid='true'] {
