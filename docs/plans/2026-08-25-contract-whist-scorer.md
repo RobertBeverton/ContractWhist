@@ -55,6 +55,10 @@ Target: **WCAG 2.2 Level AA**. UI tasks reference this section rather than resta
 - Text ≥ 4.5:1 (large text ≥ 3:1). UI components and focus rings ≥ 3:1.
 - **Never encode meaning in colour alone** (*1.4.1*). A missed contract shows a symbol or word, not just red; validation errors carry text, not just a red border.
 
+**Disabled controls with a reason (project convention, decided at Review Gate 3)**
+- A disabled button whose reason isn't obvious gets a visible, unconditional (not just `aria-describedby`) explanation paragraph next to it — see Task 14's Start button for the reference pattern.
+- Use native `disabled` (not `aria-disabled` + focusable), linked via `aria-describedby` for the assistive-tech pass that does reach it. This is a considered tradeoff, not an oversight: native `disabled` is simpler and consistent with every other disabled control in this app, and the reason is visible on-page regardless of whether a given screen reader announces the `aria-describedby` link for an unfocusable element. Re-examine this convention only if Review Gate 5's real TalkBack pass on the actual tablet shows the reason is genuinely unreachable — don't re-litigate it per screen.
+
 **Errors — 3.3.1 Error Identification, 3.3.2 Labels or Instructions, 3.3.3 Error Suggestion**
 - Errors are announced in text, associated to their input via `aria-describedby`, and the input is marked `aria-invalid="true"`.
 - Error text must say how to fix it: "Tricks won must add up to 5 (currently 2)" — not "Invalid input". The `validateRound` messages from Task 4 are already written this way.
