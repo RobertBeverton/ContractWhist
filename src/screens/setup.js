@@ -11,6 +11,12 @@ import { maxHandSize } from '../logic/handSequence.js';
  * `state.selectedPlayerIds` — array of currently-checked player ids.
  * `actions.togglePlayer(id)` / `actions.addPlayer(name)` — mutate state
  * (wired to real storage/state logic in a later task).
+ *
+ * KNOWN GAP (deliberately deferred, not forgotten): no duplicate-name check
+ * on add — two players named "Rob" would render as identical, indistinguishable
+ * checkboxes. state.allPlayers is available here if this screen ends up owning
+ * the check; revisit when Task 20 wires the real addPlayer action, which is
+ * the point a decision on which layer owns this becomes concrete.
  */
 export function renderSetup({ state, actions }) {
   const screen = document.createElement('section');
@@ -35,7 +41,7 @@ export function renderSetup({ state, actions }) {
 
   for (const player of state.allPlayers) {
     const row = document.createElement('div');
-    row.className = 'setup__player';
+    row.className = 'setup__player'; // no .target — see setup.css
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
