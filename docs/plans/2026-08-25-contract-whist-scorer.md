@@ -1219,6 +1219,10 @@ button[disabled] { opacity: 0.5; cursor: not-allowed; }
   font-weight: 600;
 }
 
+.muted {
+  color: var(--text-muted);
+}
+
 /* 1.4.10 Reflow — usable at 320px and 200% zoom. */
 .screen { max-width: 60rem; margin: 0 auto; }
 
