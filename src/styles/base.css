@@ -1,0 +1,65 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: var(--space);
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--font-base);
+  line-height: 1.5;
+}
+
+/* 2.4.7 Focus Visible — never remove without replacing. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* 2.5.8 Target Size */
+button, .target {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  font-size: var(--font-base);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+button[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Visible only to screen readers — for headings and live regions. */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* 1.4.10 Reflow — usable at 320px and 200% zoom. */
+.screen { max-width: 60rem; margin: 0 auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
