@@ -165,11 +165,20 @@ export function renderSetup({ state, actions }) {
   startButton.addEventListener('click', () => actions.startSession());
 
   // Explain WHY it's disabled — a disabled control with no reason is a dead end.
+  // NOTE: a natively `disabled` button is unfocusable, so a screen reader
+  // may never reach this description via aria-describedby regardless — a
+  // disabled control's reason is only reliably announced with the
+  // aria-disabled (not disabled) + focusable pattern. Kept as plain
+  // `disabled` here (matches the plan's reference code and every other
+  // disabled control in this codebase); flagged for Review Gate 3's
+  // keyboard/screen-reader pass to confirm whether this is sufficient.
   if (playerCount < 2) {
     const why = document.createElement('p');
+    why.id = 'start-reason';
     why.className = 'muted';
     why.textContent = 'Select at least 2 players to start.';
     screen.append(why);
+    startButton.setAttribute('aria-describedby', 'start-reason');
   }
   screen.append(startButton);
 
