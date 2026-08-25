@@ -1,0 +1,30 @@
+.stepper__label {
+  display: block;
+  font-size: var(--font-base);
+  margin-bottom: calc(var(--space) / 2);
+}
+
+.stepper__controls { display: flex; align-items: stretch; gap: var(--space); }
+
+.stepper__button {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  font-size: var(--font-large);
+  line-height: 1;
+}
+
+.stepper__input {
+  width: 4.5rem;
+  min-height: var(--target-min);
+  font-size: var(--font-large);
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.stepper__input[aria-invalid='true'] {
+  border-color: var(--danger);
+  border-width: 3px;   /* thickness, not just colour (1.4.1) */
+}
