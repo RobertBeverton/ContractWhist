@@ -790,7 +790,10 @@ import { openDb, promisifyRequest, STORES } from './db.js';
 export function createPlayer(name) {
   const trimmed = name.trim();
   const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'player';
-  const suffix = Math.random().toString(36).slice(2, 8);
+  // crypto.randomUUID() (widely supported in the target browsers) gives a
+  // collision-safe id; savePlayer does a `put`, so a colliding id would
+  // silently overwrite an unrelated player rather than erroring.
+  const suffix = crypto.randomUUID().slice(0, 8);
   return { id: `p_${slug}_${suffix}`, name: trimmed };
 }
 
