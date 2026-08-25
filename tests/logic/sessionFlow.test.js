@@ -54,6 +54,18 @@ describe('lockInRound', () => {
     const bids = { p_alex: { bid: 1, won: 1 }, p_sam: { bid: 1, won: 1 } };
     expect(lockInRound(session, bids).errors.length).toBeGreaterThan(0);
   });
+
+  it('rejects locking in a round once the session is already finished', () => {
+    const rounds = [
+      { hand: 2, results: entries2 },
+      { hand: 1, results: {} },
+      { hand: 2, results: entries2 },
+    ];
+    const finished = { ...base, rounds };
+    const result = lockInRound(finished, entries2);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.session).toBe(finished);
+  });
 });
 
 describe('editRound', () => {

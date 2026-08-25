@@ -46,6 +46,11 @@ export function lockInRound(session, entries) {
 /**
  * Replace an already-locked round. Totals are always derived from `rounds`,
  * so correcting a mistake needs no separate recompute step.
+ *
+ * Validates against `existing.hand` — this round's own stored hand size —
+ * not `currentHand(session)`. Later rounds may already exist, in which case
+ * currentHand points at a *different*, not-yet-played round; using it here
+ * would validate an edit against the wrong hand size.
  */
 export function editRound(session, roundIndex, entries) {
   const existing = session.rounds[roundIndex];
