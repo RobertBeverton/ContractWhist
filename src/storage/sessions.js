@@ -1,14 +1,20 @@
 import { openDb, promisifyRequest, STORES } from './db.js';
 import { buildHandSequence } from '../logic/handSequence.js';
 
-/** `2026-08-25-1930` — sortable, and unique enough for one tablet. */
+/**
+ * `2026-08-25-1930-a1b2` — sortable, with a random suffix so two sessions
+ * started within the same clock minute (e.g. restarting a misconfigured
+ * session) don't collide. saveSession does a `put`, so a colliding id would
+ * silently overwrite the earlier session rather than erroring.
+ */
 function buildSessionId(date) {
   const pad = (n) => String(n).padStart(2, '0');
-  return [
+  const stamp = [
     date.getFullYear(),
     pad(date.getMonth() + 1),
     pad(date.getDate()),
   ].join('-') + `-${pad(date.getHours())}${pad(date.getMinutes())}`;
+  return `${stamp}-${crypto.randomUUID().slice(0, 4)}`;
 }
 
 export function createSession({ players, startSize, dealerRestriction, now = new Date() }) {
