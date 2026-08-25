@@ -2,19 +2,16 @@
  * Render the active screen into the root element.
  * `screens` maps a screen name to a render function returning an element.
  *
- * Screens (setup, scorer, ...) are called as `renderScreen(state)` only —
- * they also need `actions` (see e.g. src/screens/setup.js's `{state, actions}`
- * param). Wiring `actions` through is deliberately deferred to Task 20
- * ("Wire actions, autosave, and resume"), which is where the caller of
- * `render(state)` will need to pass `{ state, actions }` instead of a bare
- * state object. Not a bug in this file — just not built yet.
+ * Screens (setup, scorer, ...) expect `{ state, actions }` (see e.g.
+ * src/screens/setup.js's `{state, actions}` param), so `render` takes both
+ * and passes them through together.
  */
 export function createRouter(root, screens) {
-  return function render(state) {
+  return function render(state, actions) {
     const renderScreen = screens[state.screen];
     if (!renderScreen) throw new Error(`Unknown screen: ${state.screen}`);
 
-    root.replaceChildren(renderScreen(state));
+    root.replaceChildren(renderScreen({ state, actions }));
 
     // Move focus to the new screen's heading so keyboard and screen reader
     // users land in the right place after a screen change.
