@@ -1,0 +1,51 @@
+/* Each player row is a plain checkbox + label — not a button — so it
+   deliberately does NOT use the shared `.target` utility from base.css:
+   that class bundles 44px sizing together with visible button chrome
+   (border, background, pointer cursor), which would make a checkbox row
+   look like a clickable button surrounding the whole row. Instead this
+   sets the 2.5.8 minimum target size directly, the same pattern already
+   used by `.stepper__button` in stepper.css. :focus-visible is untouched,
+   so the shared focus ring from base.css still shows on the checkbox. */
+.setup__player {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  min-height: var(--target-min);
+}
+
+.setup__player input[type='checkbox'] {
+  /* 2.5.8: the checkbox itself is part of the row's target area. */
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.setup__player label {
+  font-size: var(--font-base);
+}
+
+.setup__add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space);
+  margin-top: var(--space);
+}
+
+.setup__add label {
+  font-size: var(--font-base);
+}
+
+.setup__add input[type='text'] {
+  min-height: var(--target-min);
+  font-size: var(--font-base);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0 calc(var(--space) * 1.5);
+}
+
+.muted {
+  color: var(--text-muted);
+}
