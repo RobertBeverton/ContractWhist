@@ -15,6 +15,10 @@ export function createRouter(root, screens) {
     if (heading) {
       heading.setAttribute('tabindex', '-1');
       heading.focus();
+    } else {
+      // A screen with no <h1> silently strands focus — a WCAG 2.4.3
+      // violation. Warn loudly so it surfaces during hand-testing.
+      console.warn(`Screen "${state.screen}" has no <h1> — focus was not moved.`);
     }
   };
 }
