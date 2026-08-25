@@ -1859,6 +1859,18 @@ describe('lockInRound', () => {
     const bids = { p_alex: { bid: 1, won: 1 }, p_sam: { bid: 1, won: 1 } };
     expect(lockInRound(session, bids).errors.length).toBeGreaterThan(0);
   });
+
+  it('rejects locking in a round once the session is already finished', () => {
+    const rounds = [
+      { hand: 2, results: entries2 },
+      { hand: 1, results: {} },
+      { hand: 2, results: entries2 },
+    ];
+    const finished = { ...base, rounds };
+    const result = lockInRound(finished, entries2);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.session).toBe(finished);
+  });
 });
 
 describe('editRound', () => {
@@ -1945,6 +1957,11 @@ export function lockInRound(session, entries) {
 /**
  * Replace an already-locked round. Totals are always derived from `rounds`,
  * so correcting a mistake needs no separate recompute step.
+ *
+ * Validates against `existing.hand` — this round's own stored hand size —
+ * not `currentHand(session)`. Later rounds may already exist, in which case
+ * currentHand points at a *different*, not-yet-played round; using it here
+ * would validate an edit against the wrong hand size.
  */
 export function editRound(session, roundIndex, entries) {
   const existing = session.rounds[roundIndex];
@@ -1967,7 +1984,7 @@ export function editRound(session, roundIndex, entries) {
 **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/logic/sessionFlow.test.js`
-Expected: PASS, 10 tests.
+Expected: PASS, 12 tests.
 
 **Step 5: Commit**
 
@@ -2546,7 +2563,7 @@ git commit -m "feat: wire scorer actions with autosave and resume"
 
 ## 🚦 Review Gate 4 — after Task 20 (end of Phase 4)
 
-**Run the suite:** `npm run test` → PASS, 56 tests.
+**Run the suite:** `npm run test` → PASS, 58 tests.
 
 **Play a full session by hand** — 4 players, start size 3 (9 rounds, quick), entering real numbers.
 
@@ -3161,7 +3178,7 @@ git commit -m "docs: record tablet device test results"
 
 ## 🚦 Review Gate 5 — after Task 25 (final gate)
 
-**Run the suite:** `npm run test` → PASS, 66 tests.
+**Run the suite:** `npm run test` → PASS, 68 tests.
 
 **Accessibility check (third of three — the full pass):**
 1. **Lighthouse → Accessibility** on all four screens: 100, zero violations.
