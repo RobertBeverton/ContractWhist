@@ -555,17 +555,11 @@ Note the change from "each row is its own bordered/margined box" to "rows share 
 
 **Step 3: `scorer.css` — the alert box and lock-in button**
 
-```css
-.scorer__alert {
-  padding: var(--space) calc(var(--space) * 1.5);
-  background: rgba(122, 46, 51, 0.08);   /* --danger at low opacity, matching
-                                             the mockup's .validation-note */
-  border: 1px solid var(--danger);
-  border-radius: var(--radius);
-  margin-bottom: var(--space);
-  color: var(--danger);
-}
+> **Already done by Task 2's implementer.** Task 2 found `.scorer__alert` had no `background` at all (inheriting `body`'s raw `--bg`), which meant its `--danger` text/border failed contrast (2.66:1, needs 4.5:1/3:1) — proven unfixable by re-picking `--danger` itself (Task 1's math), so it was given a genuine `background: var(--surface)` and `color: var(--text)` right away rather than left broken until this task. **Do not use the low-opacity `rgba(122, 46, 51, 0.08)` treatment below** — that colour is the pre-Task-1 burgundy (stale) and was never contrast-checked at that opacity against `--bg`; the solid `--surface` background already in place is the verified, correct approach. Confirm the current file already has this (`grep -n "background" src/styles/scorer.css`) before touching `.scorer__alert` — if present, leave that rule alone and only add/adjust `.scorer__lockin`/`.scorer__end` below.
+>
+> **`.scorer__end` still needs the same fix this task must apply**: it currently sets `color: var(--danger)` and `border-color: var(--danger)` directly against the page background (`--bg`) — the same failing pairing Task 2 found elsewhere (2.66:1). Use `var(--danger-on-bg)` (added by Task 2's fix, `#DB767D`) instead, since this button sits on raw felt, not a parchment surface.
 
+```css
 .scorer__lockin {
   width: 100%;
   font-size: var(--font-large);
@@ -577,8 +571,8 @@ Note the change from "each row is its own bordered/margined box" to "rows share 
 .scorer__end {
   margin-top: calc(var(--space) * 3);
   background: transparent;
-  color: var(--danger);
-  border-color: var(--danger);
+  color: var(--danger-on-bg);   /* NOT --danger — this button sits on raw --bg */
+  border-color: var(--danger-on-bg);
 }
 ```
 
@@ -627,10 +621,13 @@ Note the change from "each row is its own bordered/margined box" to "rows share 
 }
 
 .stepper__input[aria-invalid='true'] {
-  border-color: var(--danger);
+  border-color: var(--danger-on-bg);   /* NOT --danger — already fixed by
+                                           Task 2, see the note below */
   border-width: 3px;
 }
 ```
+
+> **Already done by Task 2's implementer.** Task 2 traced this exact rule and found `var(--danger)` fails here (2.66:1, needs 3:1) because the stepper input's own background is `--bg`, not `--surface` — `--danger` was only ever contrast-verified for a `--surface` background. Rather than distort the shared `--danger` token (which would break its already-correct uses elsewhere), Task 2 added `--danger-on-bg` (`#DB767D`, verified 5.0:1 on `--bg`) specifically for danger content sitting on raw felt. Confirm the current file already uses `--danger-on-bg` here (`grep -n "aria-invalid" src/styles/stepper.css`) before making any change — if present, this step needs no action.
 
 Note: the stepper's button/input use `--bg`/`--text-on-bg` (felt colours), NOT `--surface`/`--text` (parchment colours) — this is a deliberate choice matching the mockup, where steppers sit as a slightly-recessed "well" against the parchment card, not as another parchment surface. Verify this reads correctly (sufficient contrast between the stepper's felt-dark well and the parchment card it sits inside) — Task 1's contrast script already confirms `--text-on-bg` on `--bg` passes, but the NEW pairing this introduces (`--bg` well against `--surface` card background, i.e. is the boundary between them visible enough to read as a distinct control) is not a text-contrast concern (1.4.11 doesn't apply the same way to a background-against-background boundary) but is worth a manual visual check in Step 6.
 
