@@ -29,8 +29,17 @@
                                    invalid-stepper-input border. Verified
                                    5.0:1 on --bg (text), which also clears the
                                    3:1 border minimum. Do not reuse --danger
-                                   itself there — 2.66:1, fails both. */
-  --success: #2F5233;          /* darkened from a lighter mockup green — verified ≥4.5:1 on --surface */
+                                   itself there — 2.66:1, fails both. This
+                                   token is one-way: only 2.6:1 on --surface,
+                                   so don't reach for it on a card either —
+                                   use plain --danger there instead. */
+  --success: #2F5233;          /* darkened from a lighter mockup green —
+                                   verified ≥4.5:1 on --surface. Not currently
+                                   used anywhere on raw --bg — if a future
+                                   task adds one, re-run the same trace-then-
+                                   fix check that produced --danger-on-bg
+                                   rather than assuming this value carries
+                                   over; it likely won't. */
 
   --focus-ring: #8E784D;       /* darker, more muted brass than the mockup's
                                    bright brass, which failed contrast badly —
