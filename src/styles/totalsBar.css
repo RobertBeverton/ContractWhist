@@ -60,10 +60,10 @@
 
 .totals__score {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 1.75rem;              /* reduced from --font-total (2.5rem) to
-                                       fit the compact chip -- still comfortably
-                                       larger than body text for at-a-glance
-                                       reading, just not full-width-row sized */
+  font-size: 1.75rem;              /* smaller than the old full-width table's
+                                       score size, to fit the compact chip --
+                                       still comfortably larger than body text
+                                       for at-a-glance reading */
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   color: var(--text);
