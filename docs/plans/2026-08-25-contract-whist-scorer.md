@@ -3273,6 +3273,10 @@ git commit -m "feat: add PWA manifest, icons, and offline precaching"
 
 The spec's core assumption — an installable, fully offline PWA on a Samsung A9 — is not proven until this passes on the real device. Everything before this is theory.
 
+> **Real bug found here, not theoretical.** The first attempt at this task's own device test showed the app rendering as unstyled black-and-white HTML — `src/main.js` only ever imported `base.css`; every screen/component stylesheet built across Tasks 10–19 (`setup.css`, `stepper.css`, `scorer.css`, `totalsBar.css`, `roundEntry.css`, `roundHistory.css`) existed as a file but was never wired in. Several code reviews earlier in the plan noted this gap and correctly treated it as out of their own task's scope; nothing before this task actually owned closing it. Fixed by importing all six alongside `base.css` in `main.js` — Vite bundles them into one stylesheet regardless, and every screen coexists in this single-page app, so there's no code-splitting reason to import them individually per-screen.
+
+Also note: Android Chrome upgrades a bare LAN IP to `https://` automatically in some cases, which breaks against `vite preview`'s plain-HTTP server (`ERR_SSL_PROTOCOL_ERROR`) — force `http://` explicitly in the address bar rather than trusting autocomplete. Plain HTTP is enough to load and *look at* the app, but service workers require a secure context (HTTPS or `localhost`), so a true offline/install test still needs either USB port-forwarding to `localhost`, a local HTTPS dev certificate, or a real HTTPS deployment.
+
 **Files:** none (verification task).
 
 **Step 1: Serve the build on the local network**
