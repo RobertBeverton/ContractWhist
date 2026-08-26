@@ -132,7 +132,9 @@ Commit nothing yet — this task produces no lasting file. Note the final verifi
 
 **Step 1: Replace the file contents**
 
-Use the palette values verified in Task 1 (adjust the placeholders below to match whatever actually passed). Keep every token NAME exactly as-is — only values change — except: **add two new tokens** the felt/parchment split requires that the old light-theme design didn't need (`--text-on-bg` and `--text-muted-on-bg`, for text that sits directly on the page/felt rather than on a parchment card — e.g. screen headings, the totals-strip labels). Every existing component still reads `--text`/`--text-muted` for text-on-card exactly as before; only genuinely new page-level text (headings sitting on the felt background) needs the new tokens, and Task 4 is the only task that introduces such text.
+Use the palette values verified in Task 1 (adjust the placeholders below to match whatever actually passed). Keep every token NAME exactly as-is — only values change — except: **add two new tokens** the felt/parchment split requires that the old light-theme design didn't need (`--text-on-bg` and `--text-muted-on-bg`, for text that sits directly on the page/felt rather than on a parchment card — e.g. screen headings, the totals-strip labels).
+
+> **Correction — the claim originally here ("Task 4 is the only task that introduces such text") was wrong and caused a real incident.** It's actually Task 3 that repoints `body`'s own default `color` to `--text-on-bg`, which affects EVERY element in the app that doesn't have its own explicit `color`, not just new page-level headings. `--text-on-bg` also turned out to be byte-identical to `--surface` (`#F4EDD9`) in the final verified palette — so any `--surface`-background card with no explicit color (found: `.round-entry__row`, not fixed until Task 6) rendered fully invisible between Task 3 and its real fix landing. See Task 3's notes for the incident and the stopgap patch; `tokens.css` itself now carries a standing comment on this collision. When reading "Task N introduces/fixes X" anywhere in this plan, verify it against the actual current file rather than trusting the prose — several such claims drifted as tasks executed out of the order this document assumed.
 
 ```css
 :root {
@@ -261,7 +263,9 @@ h1, h2, h3 {
 }
 ```
 
-Note `body`'s `color` changes from `var(--text)` to `var(--text-on-bg)` — the page background is now dark felt, and `--text` is specifically the ink colour meant for parchment cards (see Task 2). Anything that should render in card-ink (i.e., anything actually inside a `--surface`-background card) needs to set `color: var(--text)` on that card container explicitly — Task 4 handles this for every existing card-like element (`button`, `.round-entry__row`, table cells, etc.) since they already set `background: var(--surface)` and need a matching explicit text colour rather than inheriting the new page-level default.
+Note `body`'s `color` changes from `var(--text)` to `var(--text-on-bg)` — the page background is now dark felt, and `--text` is specifically the ink colour meant for parchment cards (see Task 2). Anything that should render in card-ink (i.e., anything actually inside a `--surface`-background card) needs to set `color: var(--text)` on that card container explicitly — Task 4 handles this for `button`/`.target`.
+
+> **Real incident, already resolved — read before treating "Task 4 handles this" as sufficient.** Code review of Task 3 found the claim above was wrong in one important way: `.round-entry__name` (a player-name `<h3>` inside `.round-entry__row`, which has `background: var(--surface)`) is NOT touched by Task 4 (Task 4 only modifies `base.css`; the actual fix for `roundEntry.css` was always Task 6's job, two tasks later). Worse, `--text-on-bg` and `--surface` turned out to be byte-identical hex values in this palette (`#F4EDD9`), so the gap wasn't just "low contrast until Task 4" — it was a total, 1:1-contrast, invisible heading, live on the deployed GitHub Pages test site the user actively checks. This was patched immediately as a stopgap (`color: var(--text)` added directly to `.round-entry__row` in `roundEntry.css`, landed as its own commit right after Task 3, not deferred to Task 6) rather than left broken. **Standing rule for Tasks 5–9**: any task that changes a widely-inherited default (like `body`'s `color` here, or Task 2's `--danger` token) must not be treated as safely deferrable-and-independently-deployable from the task(s) that patch its fallout — either fix known-severe cases immediately (as done here), or explicitly hold the deploy until the patch-up task lands. Don't assume "a later task covers it" without checking which later task and whether a deploy could land in between.
 
 **Step 3: Verify offline precaching still covers the fonts**
 
@@ -488,6 +492,8 @@ git commit -m "feat: compact totals display into a chip grid, reducing vertical 
 No markup/JS changes in this task — every class these files target already exists on the correct elements (verified in the earlier CSS review). This is the highest-visual-impact task besides the totals grid, since round entry is what a rotating scorer stares at for two hours a night.
 
 **Step 1: `roundEntry.css` — parchment card rows, matching the mockup's player-row look**
+
+> **Note:** `.round-entry__row` currently has a `color: var(--text)` line already — a stopgap added right after Task 3 landed (see that task's note) when `.round-entry__name` was found rendering fully invisible on the deployed test site. The block below still sets `color: var(--text)` explicitly on `.round-entry__name` itself, which is the correct long-term home for it (matches how `.round-entry__dealer` already scopes its own color) — so applying this step's CSS as written is fine; the row-level stopgap becomes redundant once this lands and can be dropped from `.round-entry__row`, but leaving it doesn't cause a bug either.
 
 ```css
 .round-entry__row {
