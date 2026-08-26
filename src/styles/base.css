@@ -70,6 +70,19 @@ button[disabled] { opacity: 0.5; cursor: not-allowed; }
 /* 1.4.10 Reflow — usable at 320px and 200% zoom. */
 .screen { max-width: 60rem; margin: 0 auto; }
 
+/* Task 9: measured via real screenshots at the Samsung A9's native
+   1340x800 landscape orientation — 60rem (960px) left ~190px of unused
+   felt on each side, and the totals chip grid / round-entry rows (which
+   lay out horizontally, unlike summary's simple table) visibly had room
+   to spread out further. 320px and 800px-portrait were unaffected by
+   this (960px already exceeds both), so this only widens the landscape
+   tablet case specifically. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .screen {
+    max-width: 78rem;
+  }
+}
+
 /*
  * A table wider than the viewport (e.g. the bid-accuracy table, whose column
  * count grows with the number of distinct hand sizes played) scrolls itself
