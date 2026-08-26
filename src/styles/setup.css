@@ -1,20 +1,15 @@
-/* Native <fieldset>/<legend> restyled to look like a parchment card rather
-   than the browser's default notched-border grey box. setup.js is currently
-   the only file that creates <fieldset> elements (grep -rn
-   "createElement('fieldset')" src/) so this stays scoped here rather than
-   moving to base.css; if a future screen adopts fieldsets too, promote it. */
-fieldset {
-  border: none;
-  /* Browsers position <legend> to straddle the fieldset's border, using a
-     negative block-start offset baked into the UA's internal legend layout
-     (not ordinary margin/position — margin-top, float, and
-     position/inset-block-start on legend all measured 0px effect against
-     this, confirmed via headless-browser screenshot diffing). With the
-     border removed above, that offset lands the legend flush with the
-     padding edge, clipping it into the parchment card instead of sitting
-     above it. A transparent top border reinstates the space the legend
-     expects to straddle, without drawing a visible line. */
-  border-block-start: calc(var(--space) * 1.5) solid transparent;
+/* Setup screen's three grouped sections ("Who is playing?", "House rules",
+   "Starting hand size") are styled as parchment cards. These used to be
+   native <fieldset>/<legend>, but browsers position <legend> to straddle
+   the fieldset's border using a negative block-start offset baked into the
+   UA's internal legend layout — not ordinary margin/position (margin-top,
+   float, and position/inset-block-start on legend all measured 0px effect
+   against this, confirmed via headless-browser screenshot diffing, and a
+   transparent-border workaround that passed headless verification still
+   clipped the legend into the card in real-browser screenshots). setup.js
+   now renders these as <div role="group" aria-labelledby="..."> with an
+   <h2> heading instead, which has completely normal box-model behavior. */
+.setup__group {
   background: var(--surface);
   border-radius: var(--radius);
   padding: calc(var(--space) * 1.5);
@@ -22,31 +17,31 @@ fieldset {
   color: var(--text);
 }
 
-legend {
+.setup__group h2 {
   font-family: 'Fraunces', Georgia, serif;
   font-size: 1.1875rem;
   font-weight: 600;
   color: var(--text);
   padding: 0;
-  margin-bottom: var(--space);
+  margin: 0 0 var(--space) 0;
 }
 
 /* Forward-risk fix (flagged in Task 4's code review, see the plan's
    blockquote after Task 4's .muted step): base.css's shared `.muted` rule
    sets `color: var(--text-muted-on-bg)` (sage, ~2.2:1 on parchment) because
    every .muted usage sat on raw felt when that rule was written. Now that
-   fieldsets above render as parchment cards, four of setup.js's five .muted
+   the groups above render as parchment cards, four of setup.js's five .muted
    paragraphs (`empty`, `ruleHint`, and both `hint` variants — all appended
-   as fieldset children) are swept onto --surface and need --text-muted
+   as .setup__group children) are swept onto --surface and need --text-muted
    (ink-soft, verified 7.68:1 on parchment) instead. This descendant
-   selector (specificity 0,1,1 — one type selector, one class) beats the
-   ancestor rule `.muted` alone (0,1,0) regardless of stylesheet order, so
-   it reliably overrides base.css's default here. `why` ("Select at least
+   selector (specificity 0,1,1 — one class, one class) beats the ancestor
+   rule `.muted` alone (0,1,0) regardless of stylesheet order, so it
+   reliably overrides base.css's default here. `why` ("Select at least
    2 players to start.") is appended directly to `screen`, outside any
-   fieldset, so it correctly keeps inheriting the page-level
+   .setup__group, so it correctly keeps inheriting the page-level
    --text-muted-on-bg from base.css's .muted rule and is NOT touched by
    this override. */
-fieldset .muted {
+.setup__group .muted {
   color: var(--text-muted);
 }
 
