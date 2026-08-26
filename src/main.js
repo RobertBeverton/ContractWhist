@@ -6,6 +6,7 @@ import { loadAllPlayers } from './storage/players.js';
 import { loadInProgressSession } from './storage/sessions.js';
 import { renderSetup } from './screens/setup.js';
 import { renderScorer } from './screens/scorer.js';
+import { renderSummary } from './screens/summary.js';
 
 const DEFAULT_START_SIZE = 7;
 
@@ -30,7 +31,14 @@ async function main() {
 
   const actions = createActions(store);
   const root = document.querySelector('#app');
-  const render = createRouter(root, { setup: renderSetup, scorer: renderScorer });
+  // 'history' is intentionally not registered yet — Task 23 creates
+  // renderHistory and the `allSessions` state it needs; wiring it here early
+  // would leave a screen name in the router with no state to back it.
+  const render = createRouter(root, {
+    setup: renderSetup,
+    scorer: renderScorer,
+    summary: renderSummary,
+  });
 
   store.subscribe((state) => render(state, actions));
 

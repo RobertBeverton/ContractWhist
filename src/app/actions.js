@@ -143,5 +143,33 @@ export function createActions(store) {
       // for exactly the window right after setup.
       await persist(session);
     },
+
+    /** Optional backup copy — a plain download, not the primary persistence. */
+    exportSession(session) {
+      const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `whist-${session.sessionId}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+
+    goTo(screen) {
+      store.setState({ screen });
+    },
+
+    /**
+     * "New session" from the summary screen. Deliberately not just
+     * `goTo('setup')`: that alone leaves `state.session` pointing at the
+     * just-finished, already-complete session while the setup form is on
+     * screen. Clearing it here (and only here — see src/screens/summary.js)
+     * is the fix; `selectedPlayerIds`/`dealerRestriction`/`startSize` are
+     * left as-is on purpose, so the same group can start a rematch with the
+     * same house rules in one tap.
+     */
+    startNewSession() {
+      store.setState({ session: null, screen: 'setup' });
+    },
   };
 }
