@@ -1,3 +1,45 @@
+/* Native <fieldset>/<legend> restyled to look like a parchment card rather
+   than the browser's default notched-border grey box. setup.js is currently
+   the only file that creates <fieldset> elements (grep -rn
+   "createElement('fieldset')" src/) so this stays scoped here rather than
+   moving to base.css; if a future screen adopts fieldsets too, promote it. */
+fieldset {
+  border: none;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 1.5);
+  margin: 0 0 var(--space) 0;
+  color: var(--text);
+}
+
+legend {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0;
+  margin-bottom: var(--space);
+}
+
+/* Forward-risk fix (flagged in Task 4's code review, see the plan's
+   blockquote after Task 4's .muted step): base.css's shared `.muted` rule
+   sets `color: var(--text-muted-on-bg)` (sage, ~2.2:1 on parchment) because
+   every .muted usage sat on raw felt when that rule was written. Now that
+   fieldsets above render as parchment cards, four of setup.js's five .muted
+   paragraphs (`empty`, `ruleHint`, and both `hint` variants — all appended
+   as fieldset children) are swept onto --surface and need --text-muted
+   (ink-soft, verified 7.68:1 on parchment) instead. This descendant
+   selector (specificity 0,1,1 — one type selector, one class) beats the
+   ancestor rule `.muted` alone (0,1,0) regardless of stylesheet order, so
+   it reliably overrides base.css's default here. `why` ("Select at least
+   2 players to start.") is appended directly to `screen`, outside any
+   fieldset, so it correctly keeps inheriting the page-level
+   --text-muted-on-bg from base.css's .muted rule and is NOT touched by
+   this override. */
+fieldset .muted {
+  color: var(--text-muted);
+}
+
 /* Each player row is a plain checkbox + label — not a button — so it
    deliberately does NOT use the shared `.target` utility from base.css:
    that class bundles 44px sizing together with visible button chrome
@@ -11,6 +53,7 @@
   align-items: center;
   gap: var(--space);
   min-height: var(--target-min);
+  color: var(--text);
 }
 
 .setup__player input[type='checkbox'] {
@@ -18,6 +61,7 @@
   width: 1.5rem;
   height: 1.5rem;
   flex: none;
+  accent-color: var(--accent);
 }
 
 .setup__player label {
@@ -42,7 +86,7 @@
   border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-on-bg);
   padding: 0 calc(var(--space) * 1.5);
 }
 
@@ -55,12 +99,14 @@
   align-items: center;
   gap: var(--space);
   min-height: var(--target-min);
+  color: var(--text);
 }
 
 .setup__rule input[type='checkbox'] {
   width: 1.5rem;
   height: 1.5rem;
   flex: none;
+  accent-color: var(--accent);
 }
 
 .setup__rule label {
@@ -69,4 +115,7 @@
 
 .setup__start {
   margin-top: var(--space);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: var(--font-large);
+  font-weight: 600;
 }
