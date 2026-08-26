@@ -12,7 +12,9 @@
 
 /* Forward-risk fix (flagged in Task 4's code review, see the plan's
    blockquote after Task 4's .muted step, and applied identically by Task 7
-   for fieldset .muted in setup.css). base.css's shared `.muted` rule sets
+   for .setup__group .muted in setup.css, originally `fieldset .muted`
+   before setup.css moved off native fieldset/legend). base.css's shared
+   `.muted` rule sets
    `color: var(--text-muted-on-bg)` (sage, ~2.2:1 on parchment, independently
    confirmed 2.20:1 while implementing this task) because every .muted usage
    sat on raw felt when that rule was written. Now that `.history-screen
@@ -23,7 +25,7 @@
    descendant selector (specificity 0,1,1 — one class, one type selector)
    beats the ancestor rule `.muted` alone (0,1,0) regardless of stylesheet
    order, so it reliably overrides base.css's default here — same mechanism
-   as setup.css's `fieldset .muted`. The other two `.muted`-free sections on
+   as setup.css's `.setup__group .muted`. The other two `.muted`-free sections on
    this screen ("Last session", "This group, all time") don't use the
    .muted class at all, so they're unaffected either way. roundHistory.js's
    and scorer.js's own .muted paragraphs are appended directly to `screen`,
