@@ -131,7 +131,14 @@ export function renderHistory({ state, actions }) {
     tbody.append(row);
   }
   table.append(thead, tbody);
-  section.append(h2, caption, table);
+
+  // This table's column count grows with the number of distinct hand sizes
+  // played, so it's the app's most likely candidate to overflow a narrow
+  // viewport (1.4.10 Reflow) — scroll the table itself, not the page.
+  const tableWrapper = document.createElement('div');
+  tableWrapper.className = 'table-scroll';
+  tableWrapper.append(table);
+  section.append(h2, caption, tableWrapper);
   screen.append(section, backButton(actions));
 
   return screen;

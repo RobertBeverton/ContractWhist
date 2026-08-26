@@ -47,6 +47,10 @@ export function createTotalsBar({ session, playersById }) {
   }
 
   table.append(thead, tbody);
-  wrapper.append(heading, table);
+
+  const tableWrapper = document.createElement('div');
+  tableWrapper.className = 'table-scroll';
+  tableWrapper.append(table);
+  wrapper.append(heading, tableWrapper);
   return wrapper;
 }

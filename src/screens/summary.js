@@ -72,7 +72,14 @@ export function renderSummary({ state, actions }) {
     tbody.append(row);
   }
   table.append(thead, tbody);
-  screen.append(table);
+
+  // The table itself scrolls horizontally rather than the whole page, so a
+  // narrow viewport (1.4.10 Reflow) never gets a page-wide horizontal
+  // scrollbar just because this one table is a little wide.
+  const tableWrapper = document.createElement('div');
+  tableWrapper.className = 'table-scroll';
+  tableWrapper.append(table);
+  screen.append(tableWrapper);
 
   const exportButton = document.createElement('button');
   exportButton.type = 'button';

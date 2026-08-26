@@ -61,6 +61,16 @@ button[disabled] { opacity: 0.5; cursor: not-allowed; }
 /* 1.4.10 Reflow — usable at 320px and 200% zoom. */
 .screen { max-width: 60rem; margin: 0 auto; }
 
+/*
+ * A table wider than the viewport (e.g. the bid-accuracy table, whose column
+ * count grows with the number of distinct hand sizes played) scrolls itself
+ * horizontally rather than forcing the whole page to scroll sideways.
+ */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
