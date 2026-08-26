@@ -8,6 +8,12 @@
   border-radius: var(--radius);
   margin-bottom: var(--space);
   background: var(--surface);
+  /* Stopgap fix, landed with the felt/parchment reskin's font/color task
+     rather than waiting for this file's own full restyle pass: body's
+     default text colour is --text-on-bg, which is byte-identical to
+     --surface in this palette — without this override, .round-entry__name
+     was rendering at exactly 1:1 contrast (invisible) on this card. */
+  color: var(--text);
 }
 
 .round-entry__name {
