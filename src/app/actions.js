@@ -1,5 +1,5 @@
 import { lockInRound, editRound } from '../logic/sessionFlow.js';
-import { saveSession, createSession } from '../storage/sessions.js';
+import { saveSession, createSession, loadAllSessions } from '../storage/sessions.js';
 import { createPlayer, savePlayer } from '../storage/players.js';
 
 export function createActions(store) {
@@ -157,6 +157,25 @@ export function createActions(store) {
 
     goTo(screen) {
       store.setState({ screen });
+    },
+
+    /**
+     * Navigate to the history screen with fresh data.
+     *
+     * `state.allSessions` is seeded once at boot (src/main.js) and nothing
+     * else keeps it current — a session that just ended via endSession()
+     * wouldn't show up in "History and stats" without this. Refetching here,
+     * on the way into the one screen that reads bulk session history, is
+     * simpler and just as correct as threading incremental updates through
+     * every place a session is saved (startSession, lockInRound, saveEdit,
+     * endSession) for an app whose own spec caps history at low hundreds of
+     * sessions. Deliberately not folded into `goTo`, which stays a generic,
+     * screen-agnostic navigation primitive (see startNewSession's comment
+     * above for the same reasoning applied to a different screen).
+     */
+    async viewHistory() {
+      const allSessions = await loadAllSessions();
+      store.setState({ allSessions, screen: 'history' });
     },
 
     /**

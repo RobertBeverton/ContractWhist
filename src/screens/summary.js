@@ -82,7 +82,7 @@ export function renderSummary({ state, actions }) {
   const historyButton = document.createElement('button');
   historyButton.type = 'button';
   historyButton.textContent = 'View history and stats';
-  historyButton.addEventListener('click', () => actions.goTo('history'));
+  historyButton.addEventListener('click', () => actions.viewHistory());
 
   const newButton = document.createElement('button');
   newButton.type = 'button';
