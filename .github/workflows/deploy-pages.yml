@@ -1,0 +1,45 @@
+name: Deploy device-test build to GitHub Pages
+
+# Manual only, from this branch — a temporary way to get a real HTTPS URL for
+# testing the PWA install/offline flow on a tablet that can't use USB
+# debugging or a local trusted certificate (see docs/plans device-test notes).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+      # Must match the Pages subpath (repo name) so root-relative asset and
+      # manifest URLs resolve correctly at https://user.github.io/repo/.
+      - run: npx vite build
+        env:
+          VITE_BASE: /ContractWhist/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
