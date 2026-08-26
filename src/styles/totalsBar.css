@@ -1,16 +1,70 @@
-.totals__table { width: 100%; border-collapse: collapse; }
+/* A table visually laid out as a compact grid of chips, not a row list --
+   each <tr> becomes one grid cell. Semantics (scope="row"/"col", the table
+   itself) are unchanged; this is presentation only. */
+.totals__table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--space);
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.totals__table thead {
+  /* The header row (Player/Score column labels) stays visually hidden --
+     the totals-heading <h2> above the table already gives it an accessible
+     name (see totalsBar.js), and repeating "Player"/"Score" as grid-cell
+     text would look wrong for a chip layout. Screen readers still get the
+     scope="col" semantics from the table structure itself. Same technique
+     as base.css's .visually-hidden utility -- kept inline here rather than
+     applying that class in totalsBar.js, since this is meant to be a
+     CSS-only change with zero markup edits. */
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.totals__table tbody {
+  display: contents;   /* let <tr> children participate directly in the grid */
+}
+
+.totals__table tr {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 0.75) var(--space);
+}
 
 .totals__table th,
 .totals__table td {
   text-align: left;
-  padding: var(--space);
-  border-bottom: 1px solid var(--border);
-  font-size: var(--font-large);
+  padding: 0;
+  border: none;
+  font-size: var(--font-base);
+  color: var(--text);
+}
+
+.totals__table th[scope='row'] {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .totals__score {
-  font-size: var(--font-total);
-  font-variant-numeric: tabular-nums;   /* digits don't jitter as scores change */
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.75rem;              /* reduced from --font-total (2.5rem) to
+                                       fit the compact chip -- still comfortably
+                                       larger than body text for at-a-glance
+                                       reading, just not full-width-row sized */
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
-  text-align: right;
+  color: var(--text);
 }
