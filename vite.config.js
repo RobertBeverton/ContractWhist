@@ -1,7 +1,14 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Normally '/' (served from the domain root). Overridable via --base for a
+// build hosted under a subpath (e.g. GitHub Pages project sites serve from
+// /repo-name/, not /) — see .github/workflows/deploy-pages.yml, used only
+// for temporary device testing, not the app's real deployment target.
+const base = process.env.VITE_BASE ?? '/';
+
 export default defineConfig({
+  base,
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
@@ -15,7 +22,9 @@ export default defineConfig({
         display: 'standalone',
         // Spec: tablet is the primary device, but allow rotation (1.3.4).
         orientation: 'any',
-        start_url: '/',
+        // Must stay within `scope` (which vite-plugin-pwa derives from
+        // `base`) or Chrome refuses to treat the manifest as installable.
+        start_url: base,
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
