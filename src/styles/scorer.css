@@ -1,5 +1,7 @@
 .scorer__alert {
   padding: var(--space);
+  background: var(--surface);
+  color: var(--text);
   border: 3px solid var(--danger);
   border-radius: var(--radius);
   margin-bottom: var(--space);

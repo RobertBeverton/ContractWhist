@@ -18,12 +18,18 @@
   --accent-text: #F4EDD9;      /* parchment text on the accent button */
 
   /* Status — never used as the ONLY signal (1.4.1) */
-  --danger: #B43C41;           /* burgundy — verified ≥4.5:1 on --surface, its
-                                   only actual usage in this app (see
-                                   tests/tokens.contrast.mjs history in the
-                                   plan doc: no colour can hit 4.5:1 on BOTH
-                                   --surface and --bg simultaneously given
-                                   this bg/surface pair — proven, not a gap) */
+  --danger: #B43C41;           /* burgundy — verified ≥4.5:1 on --surface. Task
+                                   1 proved no single colour hits 4.5:1 on BOTH
+                                   --surface and --bg (their luminance bands
+                                   for that target don't overlap) — this value
+                                   is for danger content on a --surface (or
+                                   --surface-toned) background specifically. */
+  --danger-on-bg: #DB767D;     /* a lighter burgundy for danger content that
+                                   sits directly on raw --bg (felt) — e.g. the
+                                   invalid-stepper-input border. Verified
+                                   5.0:1 on --bg (text), which also clears the
+                                   3:1 border minimum. Do not reuse --danger
+                                   itself there — 2.66:1, fails both. */
   --success: #2F5233;          /* darkened from a lighter mockup green — verified ≥4.5:1 on --surface */
 
   --focus-ring: #8E784D;       /* darker, more muted brass than the mockup's

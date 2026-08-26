@@ -35,6 +35,9 @@
 }
 
 .stepper__input[aria-invalid='true'] {
-  border-color: var(--danger);
+  /* --danger-on-bg, not --danger: this input's own background is --bg (a
+     "well" against the parchment card around it), and plain --danger only
+     clears contrast against --surface, not --bg — see tokens.css. */
+  border-color: var(--danger-on-bg);
   border-width: 3px;   /* thickness, not just colour (1.4.1) */
 }
