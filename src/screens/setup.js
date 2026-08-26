@@ -31,6 +31,29 @@ export function renderSetup({ state, actions }) {
   heading.textContent = 'New session';
   screen.append(heading);
 
+  // History is reachable from here too, not just from the post-game summary
+  // screen (previously the only entry point). Placed right under the
+  // heading rather than near "Start session" below: it's a lower-emphasis,
+  // read-only detour ("check the record before you play"), and grouping it
+  // with the primary "Start session" CTA at the bottom risked it reading as
+  // part of that flow (e.g. a "start with history" misread) or stealing
+  // thumb-priority from it. Same action as summary.js's "View history and
+  // stats" button (actions.viewHistory()) — history.js already adapts its
+  // "This group, all time" section to whatever's in state.selectedPlayerIds,
+  // so this button intentionally does nothing extra with the current
+  // checkboxes; it just reuses them by not resetting selection first.
+  // Always shown, even with zero past sessions: history.js already renders
+  // a graceful "No past sessions found yet." message with a working Back
+  // button for that case, so gating this on history existing would just be
+  // a second thing to keep in sync for no real benefit.
+  const historyButton = document.createElement('button');
+  historyButton.type = 'button';
+  historyButton.className = 'setup__history';
+  historyButton.textContent = 'View history';
+  historyButton.setAttribute('aria-label', 'View history and stats');
+  historyButton.addEventListener('click', () => actions.viewHistory());
+  screen.append(historyButton);
+
   // --- Player selection -----------------------------------------------
   const playersGroup = document.createElement('div');
   playersGroup.className = 'setup__group';

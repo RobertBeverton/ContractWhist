@@ -1,3 +1,13 @@
+/* "View history" — plain (non-.primary) button under the "New session"
+   heading, deliberately not full-width like .setup__start below: it's a
+   secondary, lower-emphasis detour off the main flow, not another primary
+   call to action. margin-bottom (rather than .setup__group's margin-top)
+   keeps it visually separate from the "Who is playing?" card immediately
+   below it. */
+.setup__history {
+  margin-bottom: var(--space);
+}
+
 /* Setup screen's three grouped sections ("Who is playing?", "House rules",
    "Starting hand size") are styled as parchment cards. These used to be
    native <fieldset>/<legend>, but browsers position <legend> to straddle
