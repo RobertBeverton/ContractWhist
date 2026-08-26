@@ -7,5 +7,17 @@
   margin-bottom: var(--space);
 }
 
-.scorer__lockin { width: 100%; font-size: var(--font-large); margin-bottom: var(--space); }
-.scorer__end { margin-top: calc(var(--space) * 3); }
+.scorer__lockin {
+  width: 100%;
+  font-size: var(--font-large);
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  margin-bottom: var(--space);
+}
+
+.scorer__end {
+  margin-top: calc(var(--space) * 3);
+  background: transparent;
+  color: var(--danger-on-bg);   /* NOT --danger — this button sits on raw --bg */
+  border-color: var(--danger-on-bg);
+}

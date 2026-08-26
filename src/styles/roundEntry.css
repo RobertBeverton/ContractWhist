@@ -1,25 +1,38 @@
 .round-entry__row {
   display: flex;
   flex-wrap: wrap;         /* stacks on narrow widths — 1.4.10 Reflow */
-  align-items: flex-end;
+  align-items: center;
   gap: var(--space);
-  padding: var(--space);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: var(--space);
+  padding: var(--space) calc(var(--space) * 1.25);
+  border: none;
+  border-bottom: 1px solid rgba(28, 35, 24, 0.08);  /* matches mockup's subtle
+                                                         row divider on parchment */
+  margin-bottom: 0;
   background: var(--surface);
-  /* Stopgap fix, landed with the felt/parchment reskin's font/color task
-     rather than waiting for this file's own full restyle pass: body's
-     default text colour is --text-on-bg, which is byte-identical to
-     --surface in this palette — without this override, .round-entry__name
-     was rendering at exactly 1:1 contrast (invisible) on this card. */
-  color: var(--text);
+}
+
+.round-entry__row:first-of-type {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.round-entry__row:last-of-type {
+  border-bottom: none;
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
 }
 
 .round-entry__name {
   flex: 1 1 8rem;
   margin: 0;
   font-size: var(--font-large);
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.round-entry__dealer { font-size: var(--font-base); color: var(--text-muted); }
+.round-entry__dealer {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+  font-weight: 400;
+}

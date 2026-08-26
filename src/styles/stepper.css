@@ -1,16 +1,23 @@
 .stepper__label {
   display: block;
-  font-size: var(--font-base);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
   margin-bottom: calc(var(--space) / 2);
+  font-weight: 600;
 }
 
-.stepper__controls { display: flex; align-items: stretch; gap: var(--space); }
+.stepper__controls { display: flex; align-items: stretch; gap: calc(var(--space) / 2); }
 
 .stepper__button {
   min-width: var(--target-min);
   min-height: var(--target-min);
   font-size: var(--font-large);
   line-height: 1;
+  background: var(--bg);
+  color: var(--text-on-bg);
+  border-color: var(--border);
 }
 
 .stepper__input {
@@ -21,7 +28,7 @@
   border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-on-bg);
   /* Hide the native spin buttons — they're far below the 44px target size
      this component exists to provide; the −/+ buttons replace them. */
   -moz-appearance: textfield;
