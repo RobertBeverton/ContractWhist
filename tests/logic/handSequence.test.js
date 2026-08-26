@@ -17,15 +17,15 @@ describe('maxHandSize', () => {
 });
 
 describe('buildHandSequence', () => {
-  it('counts down to 1 then back up to the start', () => {
-    expect(buildHandSequence(3)).toEqual([3, 2, 1, 2, 3]);
+  it('counts up to the max then back down to 1', () => {
+    expect(buildHandSequence(3)).toEqual([1, 2, 3, 2, 1]);
   });
 
-  it('handles a start size of 1 as a single round', () => {
+  it('handles a max size of 1 as a single round', () => {
     expect(buildHandSequence(1)).toEqual([1]);
   });
 
-  it('produces 2n-1 rounds for a start size of n', () => {
+  it('produces 2n-1 rounds for a max size of n', () => {
     expect(buildHandSequence(7)).toHaveLength(13);
   });
 });

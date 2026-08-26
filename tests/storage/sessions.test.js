@@ -14,20 +14,20 @@ const players = ['p_alex', 'p_sam'];
 
 describe('createSession', () => {
   it('starts in progress with no rounds', () => {
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
     expect(session.status).toBe('in-progress');
     expect(session.rounds).toEqual([]);
   });
 
   it('records the rule variant in use', () => {
     // Recorded per session so old sessions stay unambiguous if the rule changes.
-    const session = createSession({ players, startSize: 3, dealerRestriction: true });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: true });
     expect(session.rules).toEqual({ dealerRestriction: true });
   });
 
   it('stores the hand sequence for the session', () => {
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
-    expect(session.handSequence).toEqual([3, 2, 1, 2, 3]);
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
+    expect(session.handSequence).toEqual([1, 2, 3, 2, 1]);
   });
 });
 
@@ -37,14 +37,14 @@ describe('saveSession / loadAllSessions', () => {
   });
 
   it('round-trips a session', async () => {
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
     await saveSession(session);
     expect(await loadAllSessions()).toEqual([session]);
   });
 
   it('overwrites on repeated save rather than duplicating', async () => {
     // Autosave writes the same sessionId after every round.
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
     await saveSession(session);
     await saveSession({ ...session, rounds: [{ hand: 3, results: {} }] });
     const all = await loadAllSessions();
@@ -59,13 +59,13 @@ describe('loadInProgressSession', () => {
   });
 
   it('finds an in-progress session to resume', async () => {
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
     await saveSession(session);
     expect((await loadInProgressSession()).sessionId).toBe(session.sessionId);
   });
 
   it('ignores completed sessions', async () => {
-    const session = createSession({ players, startSize: 3, dealerRestriction: false });
+    const session = createSession({ players, maxSize: 3, dealerRestriction: false });
     await saveSession({ ...session, status: 'complete' });
     expect(await loadInProgressSession()).toBeNull();
   });

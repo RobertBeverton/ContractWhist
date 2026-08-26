@@ -17,7 +17,7 @@ import { renderScorer } from './screens/scorer.js';
 import { renderSummary } from './screens/summary.js';
 import { renderHistory } from './screens/history.js';
 
-const DEFAULT_START_SIZE = 7;
+const DEFAULT_MAX_SIZE = 7;
 
 async function main() {
   const allPlayers = await loadAllPlayers();
@@ -36,7 +36,7 @@ async function main() {
     allSessions,
     selectedPlayerIds: [],
     dealerRestriction: false,
-    startSize: DEFAULT_START_SIZE,
+    maxSize: DEFAULT_MAX_SIZE,
     entries: {},
     errors: [],
     editingIndex: null,

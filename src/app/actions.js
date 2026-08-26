@@ -124,15 +124,15 @@ export function createActions(store) {
       store.setState({ dealerRestriction: value });
     },
 
-    setStartSize(value) {
-      store.setState({ startSize: value });
+    setMaxSize(value) {
+      store.setState({ maxSize: value });
     },
 
     async startSession() {
-      const { selectedPlayerIds, startSize, dealerRestriction } = get();
+      const { selectedPlayerIds, maxSize, dealerRestriction } = get();
       const session = createSession({
         players: selectedPlayerIds,
-        startSize,
+        maxSize,
         dealerRestriction,
       });
       store.setState({ session, screen: 'scorer', entries: {}, errors: [], editingIndex: null });
@@ -183,7 +183,7 @@ export function createActions(store) {
      * `goTo('setup')`: that alone leaves `state.session` pointing at the
      * just-finished, already-complete session while the setup form is on
      * screen. Clearing it here (and only here — see src/screens/summary.js)
-     * is the fix; `selectedPlayerIds`/`dealerRestriction`/`startSize` are
+     * is the fix; `selectedPlayerIds`/`dealerRestriction`/`maxSize` are
      * left as-is on purpose, so the same group can start a rematch with the
      * same house rules in one tap.
      */

@@ -8,7 +8,7 @@ import { computeTotals, rankPlayers } from '../logic/totals.js';
  * mutates it.
  *
  * "New session": a bare `actions.goTo('setup')` would leave the setup
- * screen's fields (`selectedPlayerIds`, `dealerRestriction`, `startSize`)
+ * screen's fields (`selectedPlayerIds`, `dealerRestriction`, `maxSize`)
  * exactly as they were — which reads as a deliberate "quick rematch"
  * shortcut (same group, same house rules, one tap to start again) and is
  * kept. What's NOT kept is `state.session`: without clearing it, `session`

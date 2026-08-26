@@ -11,13 +11,13 @@ export function maxHandSize(playerCount) {
 }
 
 /**
- * Hand sizes for a whole session: count down from `startSize` to 1, then back up.
- * e.g. 3 -> [3, 2, 1, 2, 3]
+ * Hand sizes for a whole session: count up from 1 to `maxSize`, then back down to 1.
+ * e.g. 3 -> [1, 2, 3, 2, 1]
  */
-export function buildHandSequence(startSize) {
-  const down = [];
-  for (let n = startSize; n >= 1; n--) down.push(n);
+export function buildHandSequence(maxSize) {
   const up = [];
-  for (let n = 2; n <= startSize; n++) up.push(n);
-  return [...down, ...up];
+  for (let n = 1; n <= maxSize; n++) up.push(n);
+  const down = [];
+  for (let n = maxSize - 1; n >= 1; n--) down.push(n);
+  return [...up, ...down];
 }

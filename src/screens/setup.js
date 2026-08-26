@@ -27,8 +27,12 @@ export function renderSetup({ state, actions }) {
   screen.append(heading);
 
   // --- Player selection -----------------------------------------------
-  const playersGroup = document.createElement('fieldset');
-  const playersLegend = document.createElement('legend');
+  const playersGroup = document.createElement('div');
+  playersGroup.className = 'setup__group';
+  playersGroup.setAttribute('role', 'group');
+  playersGroup.setAttribute('aria-labelledby', 'players-heading');
+  const playersLegend = document.createElement('h2');
+  playersLegend.id = 'players-heading';
   playersLegend.textContent = 'Who is playing?';
   playersGroup.append(playersLegend);
 
@@ -90,8 +94,12 @@ export function renderSetup({ state, actions }) {
   const maxHand = playerCount >= 2 ? maxHandSize(playerCount) : null;
 
   // --- Dealer restriction ---------------------------------------------
-  const rulesGroup = document.createElement('fieldset');
-  const rulesLegend = document.createElement('legend');
+  const rulesGroup = document.createElement('div');
+  rulesGroup.className = 'setup__group';
+  rulesGroup.setAttribute('role', 'group');
+  rulesGroup.setAttribute('aria-labelledby', 'rules-heading');
+  const rulesLegend = document.createElement('h2');
+  rulesLegend.id = 'rules-heading';
   rulesLegend.textContent = 'House rules';
 
   const ruleRow = document.createElement('div');
@@ -121,10 +129,14 @@ export function renderSetup({ state, actions }) {
   rulesGroup.append(rulesLegend, ruleRow, ruleHint);
   screen.append(rulesGroup);
 
-  // --- Starting hand size ----------------------------------------------
-  const handGroup = document.createElement('fieldset');
-  const handLegend = document.createElement('legend');
-  handLegend.textContent = 'Starting hand size';
+  // --- Highest hand size -------------------------------------------------
+  const handGroup = document.createElement('div');
+  handGroup.className = 'setup__group';
+  handGroup.setAttribute('role', 'group');
+  handGroup.setAttribute('aria-labelledby', 'hand-size-heading');
+  const handLegend = document.createElement('h2');
+  handLegend.id = 'hand-size-heading';
+  handLegend.textContent = 'Highest hand size';
   handGroup.append(handLegend);
 
   if (maxHand === null) {
@@ -138,19 +150,19 @@ export function renderSetup({ state, actions }) {
     hint.id = 'hand-size-hint';
     hint.className = 'muted';
     hint.textContent =
-      `${playerCount} players — up to ${maxHand} cards each ` +
+      `${playerCount} players — hands run 1 up to ${maxHand} cards and back down to 1 ` +
       `(one card is kept back to turn up trumps).`;
 
     handGroup.append(
       hint,
       createStepper({
-        id: 'start-hand-size',
-        label: 'Cards in the first hand',
-        value: Math.min(state.startSize, maxHand),
+        id: 'max-hand-size',
+        label: 'Max cards in a hand',
+        value: Math.min(state.maxSize, maxHand),
         min: 1,
         max: maxHand,
         describedBy: 'hand-size-hint',
-        onChange: (value) => actions.setStartSize(value),
+        onChange: (value) => actions.setMaxSize(value),
       }),
     );
   }

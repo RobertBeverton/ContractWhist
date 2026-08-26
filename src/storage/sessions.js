@@ -17,14 +17,14 @@ function buildSessionId(date) {
   return `${stamp}-${crypto.randomUUID().slice(0, 4)}`;
 }
 
-export function createSession({ players, startSize, dealerRestriction, now = new Date() }) {
+export function createSession({ players, maxSize, dealerRestriction, now = new Date() }) {
   return {
     sessionId: buildSessionId(now),
     date: now.toISOString(),
     status: 'in-progress',
     rules: { dealerRestriction },
     players: [...players],
-    handSequence: buildHandSequence(startSize),
+    handSequence: buildHandSequence(maxSize),
     rounds: [],
   };
 }
