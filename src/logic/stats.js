@@ -3,11 +3,17 @@ import { computeTotals, rankPlayers } from './totals.js';
 const completed = (sessions) => sessions.filter((s) => s.status === 'complete');
 const groupKey = (playerIds) => [...playerIds].sort().join('|');
 
-/** Most recent completed session, or null. */
+/**
+ * Most recent completed session, or null.
+ * Compares `date` (a full ISO timestamp), not `sessionId` — sessionId is
+ * only minute-resolution plus a random suffix (see storage/sessions.js), so
+ * two sessions created in the same clock minute could sort by that suffix
+ * rather than actual creation order if compared as strings.
+ */
 export function lastSession(sessions) {
   const done = completed(sessions);
   if (done.length === 0) return null;
-  return done.reduce((latest, s) => (s.sessionId > latest.sessionId ? s : latest));
+  return done.reduce((latest, s) => (s.date > latest.date ? s : latest));
 }
 
 /**
@@ -36,6 +42,10 @@ export function sameGroupCumulative(sessions, playerIds) {
 
 /**
  * Contract success rate per player, overall and per hand size.
+ * Unlike sameGroupCumulative, this is NOT exact-group filtering: each
+ * player's stats are computed from every session they appear in, regardless
+ * of who else played. `playerIds` selects which players to report on, not
+ * which sessions to include.
  * Bidding a 7-card hand is a different skill from bidding a 1-card hand,
  * so the breakdown matters more than the headline number.
  */
