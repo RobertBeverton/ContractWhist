@@ -1,6 +1,11 @@
 import { lockInRound, editRound } from '../logic/sessionFlow.js';
 import { saveSession, createSession, loadAllSessions } from '../storage/sessions.js';
-import { createPlayer, savePlayer } from '../storage/players.js';
+import {
+  createPlayer,
+  savePlayer,
+  archivePlayer as archivePlayerInStorage,
+  restorePlayer as restorePlayerInStorage,
+} from '../storage/players.js';
 
 export function createActions(store) {
   const get = () => store.getState();
@@ -109,6 +114,43 @@ export function createActions(store) {
         // here, and a player added right before starting a session would
         // otherwise render as a raw id instead of their name.
         playersById: { ...playersById, [player.id]: player },
+      });
+    },
+
+    /**
+     * Soft-remove a player from the "who's playing" picker. Their id/name
+     * survive untouched in storage (see storage/players.js) — every past
+     * session, summary, and history/stats entry that already references
+     * this id keeps resolving to their real name.
+     *
+     * Also drops them from selectedPlayerIds if they were checked for the
+     * session currently being set up — an archived player shouldn't be
+     * selectable for a NEW session. Deliberately does NOT touch
+     * `state.session` (the in-progress/completed game, if any): that
+     * session's own roster lives in session.players, never re-derived from
+     * selectedPlayerIds, so archiving here can't affect a game already
+     * under way or finished.
+     */
+    async archivePlayer(id) {
+      await archivePlayerInStorage(id);
+      const { allPlayers, playersById, selectedPlayerIds } = get();
+      store.setState({
+        allPlayers: allPlayers.map((player) =>
+          player.id === id ? { ...player, archived: true } : player,
+        ),
+        playersById: { ...playersById, [id]: { ...playersById[id], archived: true } },
+        selectedPlayerIds: selectedPlayerIds.filter((playerId) => playerId !== id),
+      });
+    },
+
+    async restorePlayer(id) {
+      await restorePlayerInStorage(id);
+      const { allPlayers, playersById } = get();
+      store.setState({
+        allPlayers: allPlayers.map((player) =>
+          player.id === id ? { ...player, archived: false } : player,
+        ),
+        playersById: { ...playersById, [id]: { ...playersById[id], archived: false } },
       });
     },
 

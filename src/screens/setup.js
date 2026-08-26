@@ -7,10 +7,15 @@ import { createStepper } from '../components/stepper.js';
  * Kept in one file per the plan (the split across Tasks 13/14 was only to
  * keep each task under ~10 minutes).
  *
- * `state.allPlayers` — [{id, name}], from the player-profile store.
+ * `state.allPlayers` — [{id, name, archived}], from the player-profile store.
  * `state.selectedPlayerIds` — array of currently-checked player ids.
  * `actions.togglePlayer(id)` / `actions.addPlayer(name)` — mutate state
  * (wired to real storage/state logic in a later task).
+ * `actions.archivePlayer(id)` / `actions.restorePlayer(id)` — soft-remove
+ * a player from the picker and undo that. Archiving never deletes the
+ * record — id/name stay intact for past sessions/history to look up — so
+ * this screen filters `state.allPlayers` down to non-archived players for
+ * the main list, and surfaces archived ones separately for restoring.
  *
  * KNOWN GAP (deliberately deferred, not forgotten): no duplicate-name check
  * on add — two players named "Rob" would render as identical, indistinguishable
@@ -36,14 +41,17 @@ export function renderSetup({ state, actions }) {
   playersLegend.textContent = 'Who is playing?';
   playersGroup.append(playersLegend);
 
-  if (state.allPlayers.length === 0) {
+  const activePlayers = state.allPlayers.filter((player) => !player.archived);
+  const archivedPlayers = state.allPlayers.filter((player) => player.archived);
+
+  if (activePlayers.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'muted';
     empty.textContent = 'No players yet — add the first one below.';
     playersGroup.append(empty);
   }
 
-  for (const player of state.allPlayers) {
+  for (const player of activePlayers) {
     const row = document.createElement('div');
     row.className = 'setup__player'; // no .target — see setup.css
 
@@ -56,9 +64,69 @@ export function renderSetup({ state, actions }) {
     const label = document.createElement('label');
     label.htmlFor = checkbox.id;
     label.textContent = player.name;
+    label.className = 'setup__player-label';
 
-    row.append(checkbox, label);
+    // Soft-remove from the picker. A confirm here is deliberate — unlike
+    // toggling a checkbox, this can hide a player from every future
+    // session's picker until someone finds the "Show archived players"
+    // disclosure below, and (per the mockup) it can fire right next to an
+    // already-checked row, so a stray tap deserves one chance to back out.
+    // Same pattern as the destructive-action confirm in scorer.js.
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'setup__player-remove';
+    removeButton.textContent = '×';
+    removeButton.setAttribute('aria-label', `Remove ${player.name} from players`);
+    removeButton.addEventListener('click', () => {
+      if (window.confirm(`Remove ${player.name} from the players list? You can restore them later from "Show archived players."`)) {
+        actions.archivePlayer(player.id);
+      }
+    });
+
+    row.append(checkbox, label, removeButton);
     playersGroup.append(row);
+  }
+
+  // --- Archived players (restore) --------------------------------------
+  // A native <details>/<summary> disclosure: keyboard-accessible for free
+  // (Enter/Space toggles it, Tab reaches it in normal order) and needs no
+  // extra ARIA wiring, unlike a hand-rolled toggle button + conditional
+  // render. Always rendered (even with zero archived players) so the
+  // control's presence — and the fact that archiving is reversible — is
+  // discoverable without already knowing a player was ever removed.
+  const archivedDetails = document.createElement('details');
+  archivedDetails.className = 'setup__archived';
+
+  const archivedSummary = document.createElement('summary');
+  archivedSummary.textContent =
+    archivedPlayers.length > 0
+      ? `Show archived players (${archivedPlayers.length})`
+      : 'Show archived players';
+  archivedDetails.append(archivedSummary);
+
+  if (archivedPlayers.length === 0) {
+    const none = document.createElement('p');
+    none.className = 'muted';
+    none.textContent = 'No archived players.';
+    archivedDetails.append(none);
+  } else {
+    for (const player of archivedPlayers) {
+      const row = document.createElement('div');
+      row.className = 'setup__player';
+
+      const name = document.createElement('span');
+      name.textContent = player.name;
+      name.className = 'setup__player-label';
+
+      const restoreButton = document.createElement('button');
+      restoreButton.type = 'button';
+      restoreButton.textContent = 'Restore';
+      restoreButton.setAttribute('aria-label', `Restore ${player.name} to players`);
+      restoreButton.addEventListener('click', () => actions.restorePlayer(player.id));
+
+      row.append(name, restoreButton);
+      archivedDetails.append(row);
+    }
   }
 
   // --- Add a new player ------------------------------------------------
@@ -88,6 +156,7 @@ export function renderSetup({ state, actions }) {
 
   addRow.append(addLabel, addInput, addButton);
   playersGroup.append(addRow);
+  playersGroup.append(archivedDetails);
   screen.append(playersGroup);
 
   const playerCount = state.selectedPlayerIds.length;

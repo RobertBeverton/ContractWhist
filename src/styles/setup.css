@@ -73,6 +73,51 @@
   font-size: var(--font-base);
 }
 
+.setup__player-label {
+  font-size: var(--font-base);
+  flex: 1;
+}
+
+/* Archive ("×") / restore buttons on a player row. Plain `button` in
+   base.css already sets the 44px min target size and the focus-visible
+   ring, so no extra sizing is needed here — this only trims the button
+   down to a small square instead of stretching it to fill the row, and
+   recolours it toward --danger so the destructive action reads as such
+   without colour being the only signal (the "×" glyph + aria-label carry
+   the meaning too, satisfying 1.4.1). */
+.setup__player-remove {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: 0;
+  flex: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--surface);
+}
+
+/* Disclosure for archived (soft-removed) players, at the bottom of the
+   group. Native <details>/<summary> gets keyboard toggling (Enter/Space)
+   and normal tab order for free — no extra ARIA wiring needed. */
+.setup__archived {
+  margin-top: var(--space);
+  color: var(--text);
+}
+
+.setup__archived summary {
+  cursor: pointer;
+  min-height: var(--target-min);
+  display: flex;
+  align-items: center;
+  font-size: var(--font-base);
+  color: var(--text);
+}
+
+.setup__archived .setup__player {
+  padding-left: calc(var(--space) * 2);
+}
+
 .setup__add {
   display: flex;
   flex-wrap: wrap;
