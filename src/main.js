@@ -5,6 +5,8 @@ import './styles/scorer.css';
 import './styles/totalsBar.css';
 import './styles/roundEntry.css';
 import './styles/roundHistory.css';
+import './styles/summary.css';
+import './styles/history.css';
 import { createStore } from './app/store.js';
 import { createRouter } from './app/router.js';
 import { createActions } from './app/actions.js';
