@@ -1,4 +1,10 @@
 import './styles/base.css';
+import './styles/stepper.css';
+import './styles/setup.css';
+import './styles/scorer.css';
+import './styles/totalsBar.css';
+import './styles/roundEntry.css';
+import './styles/roundHistory.css';
 import { createStore } from './app/store.js';
 import { createRouter } from './app/router.js';
 import { createActions } from './app/actions.js';
