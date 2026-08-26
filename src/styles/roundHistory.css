@@ -1,0 +1,14 @@
+.history { margin: 0; padding-left: 0; list-style: none; }
+
+.history__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space);
+  padding: calc(var(--space) * 1.25) var(--space);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space);
+  color: var(--text);
+}

@@ -1,0 +1,181 @@
+/* "View history" — plain (non-.primary) button under the "New session"
+   heading, deliberately not full-width like .setup__start below: it's a
+   secondary, lower-emphasis detour off the main flow, not another primary
+   call to action. margin-bottom (rather than .setup__group's margin-top)
+   keeps it visually separate from the "Who is playing?" card immediately
+   below it. */
+.setup__history {
+  margin-bottom: var(--space);
+}
+
+/* Setup screen's three grouped sections ("Who is playing?", "House rules",
+   "Starting hand size") are styled as parchment cards. These used to be
+   native <fieldset>/<legend>, but browsers position <legend> to straddle
+   the fieldset's border using a negative block-start offset baked into the
+   UA's internal legend layout — not ordinary margin/position (margin-top,
+   float, and position/inset-block-start on legend all measured 0px effect
+   against this, confirmed via headless-browser screenshot diffing, and a
+   transparent-border workaround that passed headless verification still
+   clipped the legend into the card in real-browser screenshots). setup.js
+   now renders these as <div role="group" aria-labelledby="..."> with an
+   <h2> heading instead, which has completely normal box-model behavior. */
+.setup__group {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 1.5);
+  margin: 0 0 var(--space) 0;
+  color: var(--text);
+}
+
+.setup__group h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0;
+  margin: 0 0 var(--space) 0;
+}
+
+/* Forward-risk fix (flagged in Task 4's code review, see the plan's
+   blockquote after Task 4's .muted step): base.css's shared `.muted` rule
+   sets `color: var(--text-muted-on-bg)` (sage, ~2.2:1 on parchment) because
+   every .muted usage sat on raw felt when that rule was written. Now that
+   the groups above render as parchment cards, four of setup.js's five .muted
+   paragraphs (`empty`, `ruleHint`, and both `hint` variants — all appended
+   as .setup__group children) are swept onto --surface and need --text-muted
+   (ink-soft, verified 7.68:1 on parchment) instead. This descendant
+   selector (specificity 0,1,1 — one class, one class) beats the ancestor
+   rule `.muted` alone (0,1,0) regardless of stylesheet order, so it
+   reliably overrides base.css's default here. `why` ("Select at least
+   2 players to start.") is appended directly to `screen`, outside any
+   .setup__group, so it correctly keeps inheriting the page-level
+   --text-muted-on-bg from base.css's .muted rule and is NOT touched by
+   this override. */
+.setup__group .muted {
+  color: var(--text-muted);
+}
+
+/* Each player row is a plain checkbox + label — not a button — so it
+   deliberately does NOT use the shared `.target` utility from base.css:
+   that class bundles 44px sizing together with visible button chrome
+   (border, background, pointer cursor), which would make a checkbox row
+   look like a clickable button surrounding the whole row. Instead this
+   sets the 2.5.8 minimum target size directly, the same pattern already
+   used by `.stepper__button` in stepper.css. :focus-visible is untouched,
+   so the shared focus ring from base.css still shows on the checkbox. */
+.setup__player {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  min-height: var(--target-min);
+  color: var(--text);
+}
+
+.setup__player input[type='checkbox'] {
+  /* 2.5.8: the checkbox itself is part of the row's target area. */
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.setup__player label {
+  font-size: var(--font-base);
+}
+
+.setup__player-label {
+  font-size: var(--font-base);
+  flex: 1;
+}
+
+/* Archive ("×") / restore buttons on a player row. Plain `button` in
+   base.css already sets the 44px min target size and the focus-visible
+   ring, so no extra sizing is needed here — this only trims the button
+   down to a small square instead of stretching it to fill the row, and
+   recolours it toward --danger so the destructive action reads as such
+   without colour being the only signal (the "×" glyph + aria-label carry
+   the meaning too, satisfying 1.4.1). */
+.setup__player-remove {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: 0;
+  flex: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--surface);
+}
+
+/* Disclosure for archived (soft-removed) players, at the bottom of the
+   group. Native <details>/<summary> gets keyboard toggling (Enter/Space)
+   and normal tab order for free — no extra ARIA wiring needed. */
+.setup__archived {
+  margin-top: var(--space);
+  color: var(--text);
+}
+
+.setup__archived summary {
+  cursor: pointer;
+  min-height: var(--target-min);
+  display: flex;
+  align-items: center;
+  font-size: var(--font-base);
+  color: var(--text);
+}
+
+.setup__archived .setup__player {
+  padding-left: calc(var(--space) * 2);
+}
+
+.setup__add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space);
+  margin-top: var(--space);
+}
+
+.setup__add label {
+  font-size: var(--font-base);
+}
+
+.setup__add input[type='text'] {
+  min-height: var(--target-min);
+  font-size: var(--font-base);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text-on-bg);
+  padding: 0 calc(var(--space) * 1.5);
+}
+
+/* Same fix as .setup__player above: a checkbox + label row is not a
+   button, so it deliberately does NOT use the shared `.target` utility
+   from base.css (which bundles 44px sizing with button chrome). This
+   sets the 2.5.8 minimum target size directly instead. */
+.setup__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+  min-height: var(--target-min);
+  color: var(--text);
+}
+
+.setup__rule input[type='checkbox'] {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  accent-color: var(--accent);
+}
+
+.setup__rule label {
+  font-size: var(--font-base);
+}
+
+.setup__start {
+  margin-top: var(--space);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: var(--font-large);
+  font-weight: 600;
+}

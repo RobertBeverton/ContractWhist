@@ -1,0 +1,63 @@
+:root {
+  /* Surfaces */
+  --bg: #0A2B20;               /* felt-dark — the page itself */
+  --surface: #F4EDD9;          /* parchment — card backgrounds */
+  --border: #8A6C34;           /* brass-dark — verified ≥3:1 on both bg and surface */
+
+  /* Text ON --surface (cards) */
+  --text: #1C2318;             /* ink */
+  --text-muted: #4A4A3E;       /* ink-soft */
+
+  /* Text directly ON --bg (the felt page) — headings, labels outside cards.
+     --text-on-bg currently equals --surface by coincidence, not by design
+     (both happen to be this palette's parchment hex) — this bit the app
+     once already: any element with `background: var(--surface)` and no
+     explicit `color` renders invisible (1:1 contrast) against inherited
+     body text, since body's default color is --text-on-bg. If you change
+     either value, re-check every `background: var(--surface)` rule has its
+     own explicit color — don't rely on this coincidence holding. */
+  --text-on-bg: #F4EDD9;       /* parchment */
+  --text-muted-on-bg: #8FA88E; /* sage */
+
+  /* Accent (actions) */
+  --accent: #7C6230;           /* verified ≥3:1 UI contrast on --surface, and
+                                   --accent-text on --accent ≥4.5:1 */
+  --accent-text: #F4EDD9;      /* parchment text on the accent button */
+
+  /* Status — never used as the ONLY signal (1.4.1) */
+  --danger: #B43C41;           /* burgundy — verified ≥4.5:1 on --surface. Task
+                                   1 proved no single colour hits 4.5:1 on BOTH
+                                   --surface and --bg (their luminance bands
+                                   for that target don't overlap) — this value
+                                   is for danger content on a --surface (or
+                                   --surface-toned) background specifically. */
+  --danger-on-bg: #DB767D;     /* a lighter burgundy for danger content that
+                                   sits directly on raw --bg (felt) — e.g. the
+                                   invalid-stepper-input border. Verified
+                                   5.0:1 on --bg (text), which also clears the
+                                   3:1 border minimum. Do not reuse --danger
+                                   itself there — 2.66:1, fails both. This
+                                   token is one-way: only 2.6:1 on --surface,
+                                   so don't reach for it on a card either —
+                                   use plain --danger there instead. */
+  --success: #2F5233;          /* darkened from a lighter mockup green —
+                                   verified ≥4.5:1 on --surface. Not currently
+                                   used anywhere on raw --bg — if a future
+                                   task adds one, re-run the same trace-then-
+                                   fix check that produced --danger-on-bg
+                                   rather than assuming this value carries
+                                   over; it likely won't. */
+
+  --focus-ring: #8E784D;       /* darker, more muted brass than the mockup's
+                                   bright brass, which failed contrast badly —
+                                   verified ≥3:1 on both --surface and --bg */
+
+  /* Sizing — unchanged, not part of the reskin */
+  --target-min: 44px;
+  --space: 8px;
+  --radius: 8px;
+
+  /* Type — font sizes unchanged; families set separately in a later task */
+  --font-base: 1.125rem;
+  --font-large: 1.75rem;
+}

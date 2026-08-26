@@ -1,0 +1,44 @@
+/* summary.js previously had no dedicated stylesheet (Review Gate 5 finding) —
+   this closes that gap. No markup changes; every class/selector below
+   targets elements that already exist in src/screens/summary.js. */
+
+.summary__winner {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--text-on-bg);
+  margin: 0 0 var(--space) 0;
+}
+
+.screen.summary table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;   /* clips the table's own corners to the radius */
+}
+
+.screen.summary th,
+.screen.summary td {
+  text-align: left;
+  padding: calc(var(--space) * 0.75) var(--space);
+  border-bottom: 1px solid rgba(28, 35, 24, 0.08);
+  color: var(--text);
+  font-size: var(--font-base);
+}
+
+.screen.summary tbody tr:last-child th,
+.screen.summary tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.screen.summary button {
+  margin-top: var(--space);
+  width: 100%;
+}
+
+.screen.summary button.primary {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: var(--font-large);
+  font-weight: 600;
+}

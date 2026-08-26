@@ -1,0 +1,101 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: var(--space);
+  background: var(--bg);
+  color: var(--text-on-bg);
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--font-base);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+}
+
+/* 2.4.7 Focus Visible — never remove without replacing. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* 2.5.8 Target Size */
+button, .target {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  font-size: var(--font-base);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+button[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Visible only to screen readers — for headings and live regions. */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--text-muted-on-bg);   /* CHANGED from --text-muted: every current
+                                        .muted usage (grep 'className = ''muted'''
+                                        across src/) sits on the felt page, not
+                                        a parchment card — see roundHistory.js,
+                                        history.js, scorer.js, setup.js. */
+}
+
+/* 1.4.10 Reflow — usable at 320px and 200% zoom. */
+.screen { max-width: 60rem; margin: 0 auto; }
+
+/* Task 9: measured via real screenshots at the Samsung A9's native
+   1340x800 landscape orientation — 60rem (960px) left ~190px of unused
+   felt on each side, and the totals chip grid / round-entry rows (which
+   lay out horizontally, unlike summary's simple table) visibly had room
+   to spread out further. 320px and 800px-portrait were unaffected by
+   this (960px already exceeds both), so this only widens the landscape
+   tablet case specifically. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .screen {
+    max-width: 78rem;
+  }
+}
+
+/*
+ * A table wider than the viewport (e.g. the bid-accuracy table, whose column
+ * count grows with the number of distinct hand sizes played) scrolls itself
+ * horizontally rather than forcing the whole page to scroll sideways.
+ */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,50 @@
+.stepper__label {
+  display: block;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: calc(var(--space) / 2);
+  font-weight: 600;
+}
+
+.stepper__controls { display: flex; align-items: stretch; gap: calc(var(--space) / 2); }
+
+.stepper__button {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  font-size: var(--font-large);
+  line-height: 1;
+  background: var(--bg);
+  color: var(--text-on-bg);
+  border-color: var(--border);
+}
+
+.stepper__input {
+  width: 4.5rem;
+  min-height: var(--target-min);
+  font-size: var(--font-large);
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text-on-bg);
+  /* Hide the native spin buttons — they're far below the 44px target size
+     this component exists to provide; the −/+ buttons replace them. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stepper__input::-webkit-outer-spin-button,
+.stepper__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper__input[aria-invalid='true'] {
+  /* --danger-on-bg, not --danger: this input's own background is --bg (a
+     "well" against the parchment card around it), and plain --danger only
+     clears contrast against --surface, not --bg — see tokens.css. */
+  border-color: var(--danger-on-bg);
+  border-width: 3px;   /* thickness, not just colour (1.4.1) */
+}
