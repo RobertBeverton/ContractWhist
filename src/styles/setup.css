@@ -5,6 +5,16 @@
    moving to base.css; if a future screen adopts fieldsets too, promote it. */
 fieldset {
   border: none;
+  /* Browsers position <legend> to straddle the fieldset's border, using a
+     negative block-start offset baked into the UA's internal legend layout
+     (not ordinary margin/position — margin-top, float, and
+     position/inset-block-start on legend all measured 0px effect against
+     this, confirmed via headless-browser screenshot diffing). With the
+     border removed above, that offset lands the legend flush with the
+     padding edge, clipping it into the parchment card instead of sitting
+     above it. A transparent top border reinstates the space the legend
+     expects to straddle, without drawing a visible line. */
+  border-block-start: calc(var(--space) * 1.5) solid transparent;
   background: var(--surface);
   border-radius: var(--radius);
   padding: calc(var(--space) * 1.5);
