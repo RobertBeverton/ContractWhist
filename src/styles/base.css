@@ -60,7 +60,11 @@ button[disabled] { opacity: 0.5; cursor: not-allowed; }
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--text-muted-on-bg);   /* CHANGED from --text-muted: every current
+                                        .muted usage (grep 'className = ''muted'''
+                                        across src/) sits on the felt page, not
+                                        a parchment card — see roundHistory.js,
+                                        history.js, scorer.js, setup.js. */
 }
 
 /* 1.4.10 Reflow — usable at 320px and 200% zoom. */
