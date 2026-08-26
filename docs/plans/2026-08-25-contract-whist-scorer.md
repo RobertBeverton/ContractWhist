@@ -2738,7 +2738,7 @@ const sessions = [
     status: 'complete',
     players: ['p_alex', 'p_sam'],
     rounds: [
-      { hand: 2, results: { p_alex: made(1), p_sam: missed(1, 1) } },
+      { hand: 2, results: { p_alex: made(1), p_sam: missed(1, 0) } },
       { hand: 1, results: { p_alex: missed(1, 0), p_sam: made(1) } },
     ],
   },
@@ -2797,16 +2797,18 @@ describe('sameGroupCumulative', () => {
 
 describe('bidAccuracy', () => {
   it('computes overall accuracy per player', () => {
-    // Alex: made 1 of 2 in session one, made 1 of 1 in session two = 2/3.
+    // Alex played in all three sessions (the group filter is per-player
+    // presence, not session membership): made 1 of 2 in session one, made 1
+    // of 1 in session two, made 1 of 1 in session three = 3/4.
     const result = bidAccuracy(sessions, ['p_alex', 'p_sam']);
-    expect(result.p_alex.played).toBe(3);
-    expect(result.p_alex.made).toBe(2);
+    expect(result.p_alex.played).toBe(4);
+    expect(result.p_alex.made).toBe(3);
   });
 
   it('breaks accuracy down by hand size', () => {
     const result = bidAccuracy(sessions, ['p_alex', 'p_sam']);
     expect(result.p_alex.byHand[2]).toEqual({ played: 2, made: 2 });
-    expect(result.p_alex.byHand[1]).toEqual({ played: 1, made: 0 });
+    expect(result.p_alex.byHand[1]).toEqual({ played: 2, made: 1 });
   });
 
   it('ignores sessions the player did not play in', () => {
