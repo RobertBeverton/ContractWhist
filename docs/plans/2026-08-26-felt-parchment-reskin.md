@@ -999,3 +999,15 @@ This plan does not renumber or replace Review Gates 1–5 from the original buil
 5. Summary and history screens have real, dedicated styling (previously had none).
 6. Layout is verified (via screenshots, not assumption) to work reasonably at 320px, 800×1340 portrait, and 1340×800 landscape.
 7. Dark mode is fully removed, felt/parchment is the only theme.
+
+---
+
+## Gate outcome (run after all 9 tasks + the legend-clipping bugfix landed)
+
+All 7 definition-of-done points and all 5 re-verification checks **PASS**, plus the 3 persona checks were run. Two corrections/notes worth recording:
+
+- **Correction to the gate's own finding**: the gate report initially flagged Task 5's `display: contents` accessibility-tree check (Step 3 of Task 5) as "never performed" because no repo artifact documents it. That's wrong — it WAS performed, twice independently (once by Task 5's implementer, once by Task 5's own code-quality reviewer), each building a real headless-Edge + CDP `Accessibility.getFullAXTree` check against the actual rendered table and confirming `table`/`row`/`rowheader`/`cell`/`columnheader` roles survive `display: contents` intact. It produced no committed artifact because it's exactly the kind of throwaway verification Task 1 established the convention for (run it, record the result, don't commit the script) — the gate reviewer's absence-of-evidence read was a reasonable check to run but the wrong conclusion here. Recorded here so this doesn't get re-litigated as an open gap in a future pass.
+- **Real, still-open gap** (correctly flagged, not resolved by this gate): `display: contents` (Task 5) and `accent-color` (Task 7) are confirmed only via desktop Edge, not real Android Chrome/Firefox. This is the same category of gap as the original build plan's Task 25 real-device verification — tracked there, not blocking here.
+- **Fixed during the gate**: a genuinely dead `--font-total` token (Task 5 hardcoded `1.75rem` in `totalsBar.css` instead of reusing it) was found by the YAGNI Editor persona check and removed directly, along with its now-stale reference in a `totalsBar.css` comment.
+
+Reskin plan is complete.
