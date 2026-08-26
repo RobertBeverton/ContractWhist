@@ -8,7 +8,14 @@
   --text: #1C2318;             /* ink */
   --text-muted: #4A4A3E;       /* ink-soft */
 
-  /* Text directly ON --bg (the felt page) — headings, labels outside cards */
+  /* Text directly ON --bg (the felt page) — headings, labels outside cards.
+     --text-on-bg currently equals --surface by coincidence, not by design
+     (both happen to be this palette's parchment hex) — this bit the app
+     once already: any element with `background: var(--surface)` and no
+     explicit `color` renders invisible (1:1 contrast) against inherited
+     body text, since body's default color is --text-on-bg. If you change
+     either value, re-check every `background: var(--surface)` rule has its
+     own explicit color — don't rely on this coincidence holding. */
   --text-on-bg: #F4EDD9;       /* parchment */
   --text-muted-on-bg: #8FA88E; /* sage */
 
