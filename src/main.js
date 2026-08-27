@@ -1,4 +1,5 @@
 import './styles/base.css';
+import './styles/confirmDialog.css';
 import './styles/stepper.css';
 import './styles/setup.css';
 import './styles/scorer.css';
