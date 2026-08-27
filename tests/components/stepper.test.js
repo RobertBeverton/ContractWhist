@@ -64,4 +64,29 @@ describe('createStepper — lock against accidental edits', () => {
     input.dispatchEvent(new Event('blur'));
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('exposes the locked state to assistive tech via aria-describedby, not just visually', () => {
+    const el = build({ value: 2 });
+    const input = el.querySelector('.stepper__input');
+    const describedBy = input.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    const hintId = describedBy.split(' ').find((id) => id !== undefined);
+    const hint = el.querySelector(`#${hintId}`);
+    expect(hint?.textContent).toMatch(/locked/i);
+  });
+
+  it('removes the lock hint from aria-describedby once unlocked', () => {
+    const el = build({ value: 2 });
+    const input = el.querySelector('.stepper__input');
+    input.dispatchEvent(new Event('focus'));
+    const describedBy = input.getAttribute('aria-describedby');
+    expect(describedBy ?? '').not.toMatch(/lock/i);
+  });
+
+  it('keeps a caller-supplied describedBy alongside the lock hint', () => {
+    const el = build({ value: 2, invalid: true, describedBy: 'error-bid-p1' });
+    const input = el.querySelector('.stepper__input');
+    const ids = input.getAttribute('aria-describedby').split(' ');
+    expect(ids).toContain('error-bid-p1');
+  });
 });
