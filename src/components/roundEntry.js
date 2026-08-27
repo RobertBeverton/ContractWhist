@@ -9,9 +9,10 @@ import { createStepper } from './stepper.js';
  * @param {object} options.playersById
  * @param {object} options.entries   - { [playerId]: { bid, won } }
  * @param {Array} options.errors     - from validateRound
+ * @param {boolean} [options.dealerRestriction] - when true, also show the running bid total
  * @param {(playerId: string, field: string, value: number|null) => void} options.onChange
  */
-export function createRoundEntry({ hand, players, playersById, entries, errors, onChange }) {
+export function createRoundEntry({ hand, players, playersById, entries, errors, dealerRestriction, onChange }) {
   const form = document.createElement('div');
   form.className = 'round-entry';
 
@@ -63,6 +64,30 @@ export function createRoundEntry({ hand, players, playersById, entries, errors, 
 
     form.append(row);
   });
+
+  // Live feedback so a player sees the running total build up as bids/wins
+  // are entered, rather than only finding out it's wrong after "Lock in
+  // round". validateRound() already computes the same final numbers, this
+  // just surfaces the partial sum earlier, from the same `entries` data
+  // already passed in.
+  //
+  // No aria-live here: router.js tears down and rebuilds the whole screen on
+  // every state change, including every single stepper click, so this node
+  // is brand new each time — a live region on it would announce on every
+  // keystroke across every player's fields, not just the user's own, and
+  // would double up with the role="alert" validation summary in scorer.js
+  // once a round is filled in. This is a visual fix; the text is still
+  // reachable on demand by a screen reader user navigating the page.
+  const wonSoFar = players.reduce((sum, id) => sum + (entries[id]?.won ?? 0), 0);
+  const summary = document.createElement('p');
+  summary.className = 'round-entry__summary muted';
+  let summaryText = `Tricks won so far: ${wonSoFar} of ${hand}`;
+  if (dealerRestriction) {
+    const bidSoFar = players.reduce((sum, id) => sum + (entries[id]?.bid ?? 0), 0);
+    summaryText += `. Bids so far: ${bidSoFar} of ${hand}`;
+  }
+  summary.textContent = summaryText;
+  form.append(summary);
 
   return form;
 }

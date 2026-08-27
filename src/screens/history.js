@@ -56,6 +56,7 @@ export function renderHistory({ state, actions }) {
   if (selectedPlayerIds.length >= 2) {
     const group = sameGroupCumulative(allSessions, selectedPlayerIds);
     const section = document.createElement('section');
+    section.className = 'history-screen__all-time';
     const h2 = document.createElement('h2');
     h2.textContent = 'This group, all time';
 
@@ -95,6 +96,9 @@ export function renderHistory({ state, actions }) {
   const caption = document.createElement('p');
   caption.className = 'muted';
   caption.textContent = 'How often each player makes their contract, by hand size.';
+  const legend = document.createElement('p');
+  legend.className = 'muted';
+  legend.textContent = 'A player "makes" a hand by winning exactly as many tricks as they bid.';
 
   const table = document.createElement('table');
   const thead = document.createElement('thead');
@@ -138,7 +142,7 @@ export function renderHistory({ state, actions }) {
   const tableWrapper = document.createElement('div');
   tableWrapper.className = 'table-scroll';
   tableWrapper.append(table);
-  section.append(h2, caption, tableWrapper);
+  section.append(h2, caption, legend, tableWrapper);
   screen.append(section, backButton(actions));
 
   return screen;

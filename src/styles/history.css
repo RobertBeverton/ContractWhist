@@ -68,3 +68,20 @@
   font-size: 0.9375rem;
   color: var(--text);
 }
+
+/* Percentage/count columns (every column but the first, "Player") read
+   better right-aligned with tabular figures, so digits line up vertically
+   for fast scanning down a column — left-aligned numbers force the eye to
+   re-find the decimal/percent position on every row. */
+.history-screen table td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Distinguishes "This group, all time" from "Last session" beyond its
+   heading text alone — same card shape as every other section, but a
+   subtle accent border marks it as the cumulative/aggregate view rather
+   than a second instance of the same kind of card. */
+.history-screen__all-time {
+  border: 1px solid var(--border);
+}

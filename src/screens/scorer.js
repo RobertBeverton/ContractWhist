@@ -2,6 +2,7 @@ import { createTotalsBar } from '../components/totalsBar.js';
 import { createRoundEntry } from '../components/roundEntry.js';
 import { createRoundHistory } from '../components/roundHistory.js';
 import { currentHand, isComplete } from '../logic/sessionFlow.js';
+import { createConfirmDialog } from '../components/confirmDialog.js';
 
 /**
  * Live scorer screen: heading, totals, round entry (or edit), history, and
@@ -31,7 +32,7 @@ export function renderScorer({ state, actions }) {
   heading.textContent = editing
     ? `Editing round ${roundNumber} — hand of ${hand}`
     : hand !== null
-      ? `Round ${roundNumber} — dealing ${hand} cards each`
+      ? `Round ${roundNumber} of ${session.handSequence.length} — dealing ${hand} card${hand === 1 ? '' : 's'} each`
       : 'All rounds played';
   screen.append(heading);
 
@@ -75,6 +76,7 @@ export function renderScorer({ state, actions }) {
         playersById,
         entries,
         errors,
+        dealerRestriction: session.rules.dealerRestriction,
         onChange: actions.updateEntry,
       }),
     );
@@ -115,14 +117,22 @@ export function renderScorer({ state, actions }) {
   endButton.type = 'button';
   endButton.className = 'scorer__end';
   endButton.textContent = sessionComplete ? 'See final scores' : 'End session early';
+  const endDialog = createConfirmDialog({
+    message: 'End this session now? The game will be marked finished.',
+    confirmLabel: 'End session',
+    onConfirm: () => actions.endSession(),
+  });
   endButton.addEventListener('click', () => {
     // Ending early commits the session as complete — it can no longer be
     // resumed as in-progress. A fat-fingered tap here would silently cut a
     // real game short with no undo, so confirm before committing. No prompt
     // needed once every round is already played — nothing is lost then.
-    if (sessionComplete || window.confirm('End this session now? The game will be marked finished.')) {
+    if (sessionComplete) {
       actions.endSession();
+      return;
     }
+    document.body.append(endDialog.element);
+    endDialog.open();
   });
   screen.append(endButton);
 

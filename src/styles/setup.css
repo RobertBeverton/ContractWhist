@@ -120,8 +120,34 @@
   min-height: var(--target-min);
   display: flex;
   align-items: center;
+  gap: calc(var(--space) / 2);
   font-size: var(--font-base);
-  color: var(--text);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* The default triangle marker is browser-styled and inconsistent across
+   engines; replace it with an explicit chevron that rotates on open, so
+   the control's state (collapsed/expanded) is visible at a glance. */
+.setup__archived summary::marker,
+.setup__archived summary::-webkit-details-marker {
+  display: none;
+}
+
+.setup__archived summary::before {
+  content: '▸';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.setup__archived[open] summary::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .setup__archived summary::before {
+    transition: none;
+  }
 }
 
 .setup__archived .setup__player {

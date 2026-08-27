@@ -1,4 +1,5 @@
 import './styles/base.css';
+import './styles/confirmDialog.css';
 import './styles/stepper.css';
 import './styles/setup.css';
 import './styles/scorer.css';
@@ -16,6 +17,7 @@ import { renderSetup } from './screens/setup.js';
 import { renderScorer } from './screens/scorer.js';
 import { renderSummary } from './screens/summary.js';
 import { renderHistory } from './screens/history.js';
+import { createConfirmDialog } from './components/confirmDialog.js';
 
 const DEFAULT_MAX_SIZE = 7;
 
@@ -58,12 +60,19 @@ async function main() {
 
   const inProgress = await loadInProgressSession();
   if (inProgress) {
-    const resume = window.confirm(
-      `Resume the session from ${new Date(inProgress.date).toLocaleString()}?`,
-    );
-    if (resume) {
-      store.setState({ session: inProgress, screen: 'scorer' });
-    }
+    await new Promise((resolve) => {
+      const dialog = createConfirmDialog({
+        message: `Resume the session from ${new Date(inProgress.date).toLocaleString()}?`,
+        confirmLabel: 'Resume',
+        onConfirm: () => {
+          store.setState({ session: inProgress, screen: 'scorer' });
+          resolve();
+        },
+        onCancel: resolve,
+      });
+      document.body.append(dialog.element);
+      dialog.open();
+    });
   }
 
   render(store.getState(), actions);
