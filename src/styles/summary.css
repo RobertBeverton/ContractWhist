@@ -42,3 +42,22 @@
   font-size: var(--font-large);
   font-weight: 600;
 }
+
+/* Tied-for-first gets a card treatment and an accent left-edge, instead of
+   the same caption weight as every other line on the page — a tie is the
+   single most narratively important fact on this screen and previously had
+   no more visual weight than any other paragraph. */
+.summary__winner--tied {
+  background: var(--surface);
+  color: var(--text);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 1.25) calc(var(--space) * 1.5);
+}
+
+/* Visually links the tied rows in the results table to the callout above,
+   so "Position 1" appearing twice reads as "these two are tied," not as a
+   ranking bug. */
+.screen.summary tbody tr.summary__tied-row {
+  background: rgba(124, 98, 48, 0.08);
+}

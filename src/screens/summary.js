@@ -34,7 +34,7 @@ export function renderSummary({ state, actions }) {
   const winners = ranked.filter((r) => r.rank === 1);
 
   const winnerLine = document.createElement('p');
-  winnerLine.className = 'summary__winner';
+  winnerLine.className = winners.length > 1 ? 'summary__winner summary__winner--tied' : 'summary__winner';
   const names = winners.map((w) => playersById[w.playerId]?.name ?? w.playerId);
   winnerLine.textContent =
     winners.length === 1
@@ -56,6 +56,9 @@ export function renderSummary({ state, actions }) {
   const tbody = document.createElement('tbody');
   for (const { playerId, score, rank } of ranked) {
     const row = document.createElement('tr');
+    if (rank === 1 && winners.length > 1) {
+      row.className = 'summary__tied-row';
+    }
 
     const rankCell = document.createElement('td');
     rankCell.textContent = String(rank);
