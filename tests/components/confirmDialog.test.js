@@ -85,4 +85,23 @@ describe('createConfirmDialog', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
   });
+
+  it('removes itself from the DOM after closing via the confirm button', () => {
+    const { element, open } = createConfirmDialog({
+      message: 'End this session now?',
+      confirmLabel: 'End session',
+      onConfirm: () => {},
+    });
+    document.body.append(element);
+    element.showModal = vi.fn();
+    element.close = vi.fn(() => element.dispatchEvent(new Event('close')));
+    open();
+
+    const confirmButton = [...element.querySelectorAll('button')].find(
+      (b) => b.textContent === 'End session',
+    );
+    confirmButton.click();
+
+    expect(element.isConnected).toBe(false);
+  });
 });
