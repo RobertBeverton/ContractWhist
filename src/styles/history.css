@@ -68,3 +68,12 @@
   font-size: 0.9375rem;
   color: var(--text);
 }
+
+/* Percentage/count columns (every column but the first, "Player") read
+   better right-aligned with tabular figures, so digits line up vertically
+   for fast scanning down a column — left-aligned numbers force the eye to
+   re-find the decimal/percent position on every row. */
+.history-screen table td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
