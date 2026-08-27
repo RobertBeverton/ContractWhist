@@ -77,3 +77,11 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* Distinguishes "This group, all time" from "Last session" beyond its
+   heading text alone — same card shape as every other section, but a
+   subtle accent border marks it as the cumulative/aggregate view rather
+   than a second instance of the same kind of card. */
+.history-screen__all-time {
+  border: 1px solid var(--border);
+}

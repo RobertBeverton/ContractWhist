@@ -37,6 +37,36 @@ function actions() {
   };
 }
 
+describe('renderHistory — all-time section class hook', () => {
+  it('adds history-screen__all-time only to the "This group, all time" section', () => {
+    const screen = renderHistory({
+      state: baseState({ selectedPlayerIds: ['p1', 'p2'] }),
+      actions: actions(),
+    });
+
+    const allTimeSections = screen.querySelectorAll('.history-screen__all-time');
+    expect(allTimeSections.length).toBe(1);
+
+    const h2 = allTimeSections[0].querySelector('h2');
+    expect(h2.textContent).toBe('This group, all time');
+
+    // Sanity check: no other section (e.g. "Last session", bid accuracy)
+    // picked up the class.
+    const sections = [...screen.querySelectorAll('section')];
+    const withClass = sections.filter((s) => s.classList.contains('history-screen__all-time'));
+    expect(withClass).toEqual([allTimeSections[0]]);
+  });
+
+  it('does not render the all-time section (or its class) when fewer than 2 players are selected', () => {
+    const screen = renderHistory({
+      state: baseState({ selectedPlayerIds: ['p1'] }),
+      actions: actions(),
+    });
+
+    expect(screen.querySelector('.history-screen__all-time')).toBeNull();
+  });
+});
+
 describe('renderHistory — bid-accuracy legend and alignment', () => {
   it('renders a legend paragraph between the caption and the table', () => {
     const screen = renderHistory({ state: baseState(), actions: actions() });

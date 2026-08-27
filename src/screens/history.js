@@ -56,6 +56,7 @@ export function renderHistory({ state, actions }) {
   if (selectedPlayerIds.length >= 2) {
     const group = sameGroupCumulative(allSessions, selectedPlayerIds);
     const section = document.createElement('section');
+    section.className = 'history-screen__all-time';
     const h2 = document.createElement('h2');
     h2.textContent = 'This group, all time';
 
