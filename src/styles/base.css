@@ -41,7 +41,13 @@ button.primary {
   border-color: var(--accent);
 }
 
-button[disabled] { opacity: 0.5; cursor: not-allowed; }
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--surface);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
 
 /* Visible only to screen readers — for headings and live regions. */
 .visually-hidden {
