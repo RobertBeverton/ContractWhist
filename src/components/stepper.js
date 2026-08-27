@@ -44,6 +44,24 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
 
   const clamp = (n) => Math.min(max, Math.max(min, n));
 
+  // A filled-in field starts locked so a stray tap on +/- can't silently
+  // bump an already-recorded value — the player has to deliberately tap the
+  // number to open it back up. An empty field has nothing to protect, so it
+  // starts open. This is pure interaction state, not app data: it lives on
+  // the DOM node itself (data-locked) rather than in the store, because
+  // every keystroke elsewhere on the screen already triggers a full
+  // re-render (see router.js), which would otherwise wipe out "unlocked"
+  // the instant a sibling field changed.
+  let locked = value !== null;
+
+  const stepButtons = [];
+
+  const setLocked = (next) => {
+    locked = next;
+    wrapper.dataset.locked = String(locked);
+    for (const button of stepButtons) button.disabled = locked;
+  };
+
   const makeButton = (text, accessibleLabel, delta) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -57,8 +75,12 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
       input.value = String(next);
       onChange(next);
     });
+    stepButtons.push(button);
     return button;
   };
+
+  input.addEventListener('focus', () => setLocked(false));
+  input.addEventListener('blur', () => setLocked(value !== null));
 
   input.addEventListener('input', () => {
     if (input.value === '') return onChange(null);
@@ -68,5 +90,6 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
 
   controls.append(makeButton('−', 'Decrease', -1), input, makeButton('+', 'Increase', 1));
   wrapper.append(labelEl, controls);
+  setLocked(locked);
   return wrapper;
 }

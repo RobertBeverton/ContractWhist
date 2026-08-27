@@ -48,3 +48,19 @@
   border-color: var(--danger-on-bg);
   border-width: 3px;   /* thickness, not just colour (1.4.1) */
 }
+
+/* Locked: the value is visible but dimmed, and +/- are disabled (base.css's
+   button[disabled] rule already handles their disabled look) — tapping the
+   number itself is the only way back in. Unlocked (either because there's
+   no value yet, or because the player just tapped in) looks like the
+   ordinary, fully-interactive stepper.
+   --text-muted-on-bg, not --text-muted: this input's own background is
+   --bg (the dark felt page), and --text-muted ("ink-soft") is tuned for
+   text on --surface (parchment) — against --bg it would be near-illegible
+   (dark ink on dark felt). --text-muted-on-bg ("sage") is the token this
+   codebase already uses for muted text directly on --bg — see base.css's
+   .muted rule and its comment. */
+.stepper[data-locked='true'] .stepper__input {
+  color: var(--text-muted-on-bg);
+  cursor: pointer;
+}
