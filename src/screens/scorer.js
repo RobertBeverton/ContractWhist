@@ -84,7 +84,7 @@ export function renderScorer({ state, actions }) {
     const lockIn = document.createElement('button');
     lockIn.type = 'button';
     lockIn.className = 'primary scorer__lockin';
-    lockIn.textContent = editing ? 'Save changes' : 'Lock in round';
+    lockIn.textContent = editing ? 'Save changes' : 'Record scores';
     // Disabled while a previous lock-in/edit is still saving — belt-and-braces
     // alongside actions.js's own re-entrancy guard, and gives the user a
     // visible reason a rapid double-tap didn't do anything twice.
