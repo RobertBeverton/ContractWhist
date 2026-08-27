@@ -40,9 +40,53 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
   input.inputMode = 'numeric';
   input.value = value ?? '';
   if (invalid) input.setAttribute('aria-invalid', 'true');
-  if (describedBy) input.setAttribute('aria-describedby', describedBy);
+
+  // Screen-reader-only lock hint. The visual signal (dimmed number, disabled
+  // +/- buttons) has no non-visual counterpart otherwise — a screen reader
+  // user tabbing in would hear only the label and value, with nothing to
+  // explain why the buttons don't respond or that tapping the number itself
+  // reopens them. `aria-describedby` (not the newer `aria-description`) to
+  // match this component's existing, well-supported pattern for the error
+  // message below, and because `aria-description` isn't reliably supported
+  // across screen readers yet.
+  const lockHint = document.createElement('span');
+  lockHint.id = `${id}-lock-hint`;
+  lockHint.className = 'visually-hidden';
+  lockHint.textContent = 'Locked. Tap to edit.';
+
+  // aria-describedby takes a space-separated id list, so the caller's error
+  // description (if any) and the lock hint can both be referenced at once;
+  // the lock hint's id is added/removed from that list as locking toggles.
+  const describedByIds = describedBy ? [describedBy] : [];
+  const updateDescribedBy = () => {
+    const ids = locked ? [...describedByIds, lockHint.id] : describedByIds;
+    if (ids.length > 0) {
+      input.setAttribute('aria-describedby', ids.join(' '));
+    } else {
+      input.removeAttribute('aria-describedby');
+    }
+  };
 
   const clamp = (n) => Math.min(max, Math.max(min, n));
+
+  // A filled-in field starts locked so a stray tap on +/- can't silently
+  // bump an already-recorded value — the player has to deliberately tap the
+  // number to open it back up. An empty field has nothing to protect, so it
+  // starts open. This is pure interaction state, not app data: it lives on
+  // the DOM node itself (data-locked) rather than in the store, because
+  // every keystroke elsewhere on the screen already triggers a full
+  // re-render (see router.js), which would otherwise wipe out "unlocked"
+  // the instant a sibling field changed.
+  let locked = value !== null;
+
+  const stepButtons = [];
+
+  const setLocked = (next) => {
+    locked = next;
+    wrapper.dataset.locked = String(locked);
+    for (const button of stepButtons) button.disabled = locked;
+    updateDescribedBy();
+  };
 
   const makeButton = (text, accessibleLabel, delta) => {
     const button = document.createElement('button');
@@ -57,8 +101,12 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
       input.value = String(next);
       onChange(next);
     });
+    stepButtons.push(button);
     return button;
   };
+
+  input.addEventListener('focus', () => setLocked(false));
+  input.addEventListener('blur', () => setLocked(value !== null));
 
   input.addEventListener('input', () => {
     if (input.value === '') return onChange(null);
@@ -67,6 +115,7 @@ export function createStepper({ id, label, value, min, max, describedBy, invalid
   });
 
   controls.append(makeButton('−', 'Decrease', -1), input, makeButton('+', 'Increase', 1));
-  wrapper.append(labelEl, controls);
+  wrapper.append(labelEl, controls, lockHint);
+  setLocked(locked);
   return wrapper;
 }
