@@ -70,10 +70,17 @@ export function createRoundEntry({ hand, players, playersById, entries, errors, 
   // round". validateRound() already computes the same final numbers, this
   // just surfaces the partial sum earlier, from the same `entries` data
   // already passed in.
+  //
+  // No aria-live here: router.js tears down and rebuilds the whole screen on
+  // every state change, including every single stepper click, so this node
+  // is brand new each time — a live region on it would announce on every
+  // keystroke across every player's fields, not just the user's own, and
+  // would double up with the role="alert" validation summary in scorer.js
+  // once a round is filled in. This is a visual fix; the text is still
+  // reachable on demand by a screen reader user navigating the page.
   const wonSoFar = players.reduce((sum, id) => sum + (entries[id]?.won ?? 0), 0);
   const summary = document.createElement('p');
   summary.className = 'round-entry__summary muted';
-  summary.setAttribute('aria-live', 'polite');
   let summaryText = `Tricks won so far: ${wonSoFar} of ${hand}`;
   if (dealerRestriction) {
     const bidSoFar = players.reduce((sum, id) => sum + (entries[id]?.bid ?? 0), 0);
