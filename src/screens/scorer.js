@@ -32,7 +32,7 @@ export function renderScorer({ state, actions }) {
   heading.textContent = editing
     ? `Editing round ${roundNumber} — hand of ${hand}`
     : hand !== null
-      ? `Round ${roundNumber} of ${session.handSequence.length} — dealing ${hand} cards each`
+      ? `Round ${roundNumber} of ${session.handSequence.length} — dealing ${hand} card${hand === 1 ? '' : 's'} each`
       : 'All rounds played';
   screen.append(heading);
 

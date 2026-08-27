@@ -39,6 +39,16 @@ describe('renderScorer — round progress heading', () => {
 
     expect(screen.querySelector('h1').textContent).toContain('of 3');
   });
+
+  it('pluralizes "card" correctly for a hand size of 1', () => {
+    const actions = { updateEntry: vi.fn(), lockInRound: vi.fn(), editLatestRound: vi.fn(), endSession: vi.fn() };
+    const state = baseState({
+      session: { ...baseState().session, handSequence: [1, 2, 1] },
+    });
+    const screen = renderScorer({ state, actions });
+
+    expect(screen.querySelector('h1').textContent).toContain('dealing 1 card each');
+  });
 });
 
 describe('renderScorer — end session confirmation', () => {
