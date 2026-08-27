@@ -76,6 +76,7 @@ export function renderScorer({ state, actions }) {
         playersById,
         entries,
         errors,
+        dealerRestriction: session.rules.dealerRestriction,
         onChange: actions.updateEntry,
       }),
     );

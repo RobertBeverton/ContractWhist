@@ -9,9 +9,10 @@ import { createStepper } from './stepper.js';
  * @param {object} options.playersById
  * @param {object} options.entries   - { [playerId]: { bid, won } }
  * @param {Array} options.errors     - from validateRound
+ * @param {boolean} [options.dealerRestriction] - when true, also show the running bid total
  * @param {(playerId: string, field: string, value: number|null) => void} options.onChange
  */
-export function createRoundEntry({ hand, players, playersById, entries, errors, onChange }) {
+export function createRoundEntry({ hand, players, playersById, entries, errors, dealerRestriction, onChange }) {
   const form = document.createElement('div');
   form.className = 'round-entry';
 
@@ -63,6 +64,23 @@ export function createRoundEntry({ hand, players, playersById, entries, errors, 
 
     form.append(row);
   });
+
+  // Live feedback so a player sees the running total build up as bids/wins
+  // are entered, rather than only finding out it's wrong after "Lock in
+  // round". validateRound() already computes the same final numbers, this
+  // just surfaces the partial sum earlier, from the same `entries` data
+  // already passed in.
+  const wonSoFar = players.reduce((sum, id) => sum + (entries[id]?.won ?? 0), 0);
+  const summary = document.createElement('p');
+  summary.className = 'round-entry__summary muted';
+  summary.setAttribute('aria-live', 'polite');
+  let summaryText = `Tricks won so far: ${wonSoFar} of ${hand}`;
+  if (dealerRestriction) {
+    const bidSoFar = players.reduce((sum, id) => sum + (entries[id]?.bid ?? 0), 0);
+    summaryText += `. Bids so far: ${bidSoFar} of ${hand}`;
+  }
+  summary.textContent = summaryText;
+  form.append(summary);
 
   return form;
 }

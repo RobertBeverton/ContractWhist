@@ -36,3 +36,8 @@
   color: var(--text-muted);
   font-weight: 400;
 }
+
+.round-entry__summary {
+  margin-top: var(--space);
+  font-size: 0.9375rem;
+}
