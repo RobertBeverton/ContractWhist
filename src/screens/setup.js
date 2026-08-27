@@ -95,10 +95,10 @@ export function renderSetup({ state, actions }) {
     // session's picker until someone finds the "Show archived players"
     // disclosure below, and (per the mockup) it can fire right next to an
     // already-checked row, so a stray tap deserves one chance to back out.
-    // Same pattern as the destructive-action confirm in scorer.js — both
-    // now use the themed confirmDialog component instead of
-    // window.confirm(), whose browser-native chrome broke the app's visual
-    // language and couldn't be restyled or reliably restored focus after
+    // Same pattern as the destructive-action confirm in scorer.js, which
+    // will move to this same themed confirmDialog component in Task 3 —
+    // window.confirm()'s browser-native chrome breaks the app's visual
+    // language and can't be restyled or reliably restore focus after
     // closing.
     const removeButton = document.createElement('button');
     removeButton.type = 'button';

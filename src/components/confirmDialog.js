@@ -71,6 +71,15 @@ export function createConfirmDialog({ message, confirmLabel, onConfirm, onCancel
     onCancel?.();
   });
 
+  // Remove the dialog from the DOM once it's done, regardless of how it
+  // closed (confirm, cancel, or Escape/backdrop dismissal). Call sites
+  // like setup.js's per-player remove button call createConfirmDialog()
+  // fresh on every render and append the result to document.body on each
+  // click; without this, closed dialogs (with listeners still closing over
+  // stale state) would accumulate in the DOM forever instead of being
+  // cleaned up.
+  dialog.addEventListener('close', () => dialog.remove());
+
   actions.append(cancelButton, confirmButton);
   dialog.append(messageEl, actions);
 
