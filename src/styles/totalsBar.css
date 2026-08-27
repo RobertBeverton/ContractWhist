@@ -6,6 +6,8 @@
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: var(--space);
   width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
   border-collapse: collapse;
 }
 
