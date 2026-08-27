@@ -32,6 +32,15 @@ function baseState(overrides = {}) {
   };
 }
 
+describe('renderScorer — round progress heading', () => {
+  it('includes the total round count from session.handSequence', () => {
+    const actions = { updateEntry: vi.fn(), lockInRound: vi.fn(), editLatestRound: vi.fn(), endSession: vi.fn() };
+    const screen = renderScorer({ state: baseState(), actions });
+
+    expect(screen.querySelector('h1').textContent).toContain('of 3');
+  });
+});
+
 describe('renderScorer — end session confirmation', () => {
   it('does not call window.confirm when ending an incomplete session early', () => {
     const confirmSpy = vi.spyOn(window, 'confirm');
